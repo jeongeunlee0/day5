@@ -400,6 +400,7 @@
     <input class="field" id="pw" type="password" placeholder="비밀번호 (6자 이상)" required minlength="6" autocomplete="current-password" />
     <button class="btn dark" id="authsubmit">로그인</button>
   </form>
+  <p class="hint" id="authnote" style="margin-top:12px"></p>
 </div></div>
 
 <div class="modal" id="setmodal"><div class="mbox">
@@ -512,24 +513,58 @@ const DEMO_PRODUCTS = [
   [9, '제주 말차 세트', '제주 오설록 스타일 말차 티백 세트', '🍵', 21500], [10, '성게 미역국 세트', '제주 성게알이 듬뿍 든 간편 미역국', '🥣', 24900],
 ].map(([id, name, description, emoji, price]) => ({ id, name, description, emoji, price }));
 
+/* 체험 모드 인증: Supabase 없이도 가입·로그인이 실제로 동작한다. 계정과 데이터는 이 브라우저(localStorage)에만 저장된다. */
+async function hashPw(pw, salt) {
+  const bytes = new TextEncoder().encode(salt + pw);
+  if (globalThis.crypto?.subtle) {
+    const buf = await crypto.subtle.digest('SHA-256', bytes);
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 5381; for (const b of bytes) h = ((h << 5) + h + b) >>> 0; // 보안 컨텍스트가 아닐 때의 단순 대체
+  return 'x' + h.toString(16);
+}
+const newId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2));
+
 const demo = {
-  user: { id: 'demo', name: '체험 손님', email: 'demo@local' },
+  user: null,
+  uk(name) { return `${name}:${this.user?.id}`; }, // 계정별 저장 키
+  async signUp(email, password, name) {
+    email = email.trim().toLowerCase();
+    const users = load('d_users', []);
+    if (users.some((u) => u.email === email)) throw new Error('already registered');
+    const salt = newId();
+    const u = { id: newId(), email, name, salt, hash: await hashPw(password, salt) };
+    users.push(u); save('d_users', users); save('d_session', u.id);
+    return { needsConfirm: false };
+  },
+  async signIn(email, password) {
+    email = email.trim().toLowerCase();
+    const u = load('d_users', []).find((x) => x.email === email);
+    if (!u || (await hashPw(password, u.salt)) !== u.hash) throw new Error('Invalid login credentials');
+    save('d_session', u.id);
+  },
+  async signOut() { try { localStorage.removeItem('d_session'); } catch {} this.user = null; },
+  async getUser() {
+    const id = load('d_session', null);
+    const u = id && load('d_users', []).find((x) => x.id === id);
+    this.user = u ? { id: u.id, name: u.name, email: u.email } : null;
+    return this.user;
+  },
   async products() { return DEMO_PRODUCTS; },
-  async getUser() { return this.user; },
-  async cart() { return load('d_cart', []); },
+  async cart() { return load(this.uk('d_cart'), []); },
   async setCart(pid, qty) {
-    let c = load('d_cart', []); const i = c.findIndex((x) => x.product_id === pid);
-    if (i >= 0) c[i].quantity = qty; else c.push({ product_id: pid, quantity: qty }); save('d_cart', c);
+    const k = this.uk('d_cart'); let c = load(k, []); const i = c.findIndex((x) => x.product_id === pid);
+    if (i >= 0) c[i].quantity = qty; else c.push({ product_id: pid, quantity: qty }); save(k, c);
   },
-  async removeCart(pid) { save('d_cart', load('d_cart', []).filter((x) => x.product_id !== pid)); },
+  async removeCart(pid) { const k = this.uk('d_cart'); save(k, load(k, []).filter((x) => x.product_id !== pid)); },
   async order(items) {
-    const o = load('d_orders', []);
-    items.forEach((it, k) => o.unshift({ id: Date.now() + k, product_id: it.p.id, product_name: it.p.name, unit_price: it.p.price,
+    const k = this.uk('d_orders'), o = load(k, []);
+    items.forEach((it, n) => o.unshift({ id: Date.now() + n, product_id: it.p.id, product_name: it.p.name, unit_price: it.p.price,
       quantity: it.quantity, total_price: it.p.price * it.quantity, status: 'ordered', created_at: new Date().toISOString() }));
-    save('d_orders', o); save('d_cart', []);
+    save(k, o); save(this.uk('d_cart'), []);
   },
-  async orders() { return load('d_orders', []); },
-  async returnOrder(id) { save('d_orders', load('d_orders', []).map((o) => (o.id === id ? { ...o, status: 'returned' } : o))); },
+  async orders() { return load(this.uk('d_orders'), []); },
+  async returnOrder(id) { const k = this.uk('d_orders'); save(k, load(k, []).map((o) => (o.id === id ? { ...o, status: 'returned' } : o))); },
   async posts() {
     return load('d_posts', [
       { id: 1, user_id: 'x', author: '제주토박이', content: '한라봉 박스 열자마자 향이 확 퍼졌어요. 재구매 확정!', created_at: new Date(Date.now() - 3600e3 * 5).toISOString(), comments: [{ id: 1, user_id: 'y', author: '귤덕후', content: '저도 시켜봐야겠어요' }], likes: ['y'] },
@@ -537,14 +572,21 @@ const demo = {
       { id: 3, user_id: 'z', author: '바다집사', content: '오메기떡 쫀득함이 진짜예요. 선물용으로도 좋아요.', created_at: new Date(Date.now() - 3600e3 * 52).toISOString(), comments: [], likes: [] },
     ]);
   },
-  async addPost(content) { const p = load('d_posts', await this.posts()); p.unshift({ id: Date.now(), user_id: 'demo', author: this.user.name, content, created_at: new Date().toISOString(), comments: [], likes: [] }); save('d_posts', p); },
+  async addPost(content) { const p = load('d_posts', await this.posts()); p.unshift({ id: Date.now(), user_id: this.user.id, author: this.user.name, content, created_at: new Date().toISOString(), comments: [], likes: [] }); save('d_posts', p); },
   async delPost(id) { save('d_posts', (await this.posts()).filter((p) => p.id !== id)); },
-  async addComment(pid, content) { const p = await this.posts(); p.find((x) => x.id === pid)?.comments.push({ id: Date.now(), user_id: 'demo', author: this.user.name, content }); save('d_posts', p); },
+  async addComment(pid, content) { const p = await this.posts(); p.find((x) => x.id === pid)?.comments.push({ id: Date.now(), user_id: this.user.id, author: this.user.name, content }); save('d_posts', p); },
   async delComment(pid, cid) { const p = await this.posts(); const t = p.find((x) => x.id === pid); if (t) t.comments = t.comments.filter((c) => c.id !== cid); save('d_posts', p); },
-  async toggleLike(pid) { const p = await this.posts(); const t = p.find((x) => x.id === pid); if (!t) return; t.likes = t.likes.includes('demo') ? t.likes.filter((u) => u !== 'demo') : [...t.likes, 'demo']; save('d_posts', p); },
+  async toggleLike(pid) { const p = await this.posts(); const t = p.find((x) => x.id === pid); if (!t) return; const me = this.user.id; t.likes = t.likes.includes(me) ? t.likes.filter((u) => u !== me) : [...t.likes, me]; save('d_posts', p); },
 };
 
 const remote = {
+  async signUp(email, password, name) {
+    const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name } } });
+    if (error) throw error;
+    return { needsConfirm: !data.session };
+  },
+  async signIn(email, password) { const { error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error; },
+  async signOut() { const { error } = await sb.auth.signOut(); if (error) throw error; },
   async products() { const { data, error } = await sb.from('products').select('*').order('id'); if (error) throw error; return data; },
   async getUser() {
     const { data } = await sb.auth.getUser(); const u = data?.user; if (!u) return null;
@@ -588,8 +630,7 @@ const need = async (fn) => { try { return await fn(); } catch (e) { console.erro
 function renderChrome() {
   $('#mode').textContent = sb ? 'Live' : 'Demo';
   $('#storage').textContent = sb ? 'Supabase' : '이 브라우저(체험)';
-  $('#authbtn').innerHTML = !sb ? `${icon('user')}<span class="lb">체험 모드</span>` : S.user ? `${icon('user')}<span class="lb">${esc(S.user.name)} · 로그아웃</span>` : `${icon('user')}<span class="lb">로그인</span>`;
-  $('#authbtn').dataset.action = !sb ? 'settings' : 'auth';
+  $('#authbtn').innerHTML = `${icon('user')}<span class="lb">${S.user ? esc(S.user.name) + ' · 로그아웃' : '로그인'}</span>`;
   $('#gbwho').textContent = S.user ? `${S.user.name} 님으로 작성` : '로그인 후 작성할 수 있어요';
   $('#count').textContent = cartLines().reduce((a, c) => a + c.quantity, 0);
 }
@@ -730,6 +771,7 @@ function setAuthMode(m) {
   $('#nick').style.display = m === 'up' ? '' : 'none'; $('#nick').required = m === 'up';
   $('#authsubmit').textContent = m === 'up' ? '가입하기' : '로그인';
   $('#pw').autocomplete = m === 'up' ? 'new-password' : 'current-password';
+  $('#authnote').textContent = sb ? '' : '체험 모드: 계정은 이 브라우저에만 저장돼요. 실제 서비스 연결은 하단 "Supabase 연결 설정"에서 할 수 있어요.';
 }
 const requireUser = () => { if (S.user) return true; toast('로그인이 필요해요'); setAuthMode('in'); openEl('#authmodal'); return false; };
 
@@ -756,7 +798,7 @@ const ACTIONS = {
   'open-orders': async () => { if (requireUser()) { await refreshUserData(); openEl('#ordersdrawer'); } },
   settings: () => { $('#sburl').value = stored.url || ''; $('#sbkey').value = stored.key || ''; openEl('#setmodal'); },
   auth: async () => {
-    if (S.user) { await sb.auth.signOut(); toast('로그아웃했어요'); } else { setAuthMode('in'); openEl('#authmodal'); }
+    if (S.user) { await api.signOut(); await refreshUserData(); await refreshPosts(); toast('로그아웃했어요'); } else { setAuthMode('in'); openEl('#authmodal'); }
   },
   add: async (el, id) => {
     if (!requireUser()) return;
@@ -886,20 +928,37 @@ document.addEventListener('click', async (e) => {
   try { await run(el, Number(el.dataset.id)); } finally { if (!quiet) Trace.end(); }
 });
 
+const AUTH_ERRORS = [
+  [/invalid login credentials/i, '이메일 또는 비밀번호가 맞지 않아요'],
+  [/already registered|already been registered/i, '이미 가입된 이메일이에요. 로그인해 주세요'],
+  [/email not confirmed/i, '이메일 인증을 먼저 완료해 주세요'],
+  [/rate limit|too many/i, '잠시 후 다시 시도해 주세요'],
+  [/password.*(at least|short|weak)|weak password/i, '비밀번호는 6자 이상으로 입력해 주세요'],
+  [/failed to fetch|network/i, '서버에 연결하지 못했어요. 연결 설정과 네트워크를 확인해 주세요'],
+];
+const authError = (e) => AUTH_ERRORS.find(([re]) => re.test(e?.message || ''))?.[1] || e?.message || '요청에 실패했어요';
+
 $('#authform').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = $('#email').value.trim(), password = $('#pw').value;
-  await need(async () => {
+  const email = $('#email').value.trim(), password = $('#pw').value, name = $('#nick').value.trim();
+  const btn = $('#authsubmit'); btn.disabled = true;
+  try {
     if (authMode === 'up') {
-      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name: $('#nick').value.trim() } } });
-      if (error) throw error;
-      if (!data.session) { toast('가입 완료! 이메일 인증 후 로그인해주세요'); closeAll(); return; }
-      toast('환영합니다');
+      if (name.length < 2) throw new Error('닉네임은 2자 이상 입력해 주세요');
+      const r = await api.signUp(email, password, name);
+      if (r?.needsConfirm) { toast('가입 완료! 이메일 인증 후 로그인해주세요'); e.target.reset(); closeAll(); return; }
+      toast(`환영합니다, ${name}님`);
     } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error; toast('로그인되었어요');
+      await api.signIn(email, password);
+      toast('로그인되었어요');
     }
-    closeAll(); e.target.reset();
-  });
+    e.target.reset(); closeAll();
+    await refreshUserData(); await refreshPosts();
+  } catch (err) {
+    toast(authError(err), true);
+  } finally {
+    btn.disabled = false;
+  }
 });
 $('#setform').addEventListener('submit', (e) => {
   e.preventDefault(); save('jeju_sb', { url: $('#sburl').value.trim(), key: $('#sbkey').value.trim() }); location.reload();
