@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23FF5A1F'/%3E%3Ccircle cx='16' cy='16' r='11' fill='%23FFF3DE'/%3E%3Cpath d='M16 6v20M6 16h20M9 9l14 14M23 9L9 23' stroke='%23FF5A1F' stroke-width='1.6'/%3E%3C/svg%3E" />
 <title>제주상점 — 제주에서 바로 온 선물</title>
+<link rel="stylesheet" href="/cursor.css" />
 <meta name="description" content="한라봉·천혜향부터 옥돔·갈치, 오메기떡까지. 제주 특산품을 골라 담고 바로 주문하는 제주상점입니다." />
 <meta name="theme-color" content="#0B3B3C" />
 <meta property="og:type" content="website" />
@@ -455,7 +456,11 @@ const ago = (iso) => {
 };
 const TINTS = ['#FFD23F', '#FF9B6B', '#A8D5BA', '#9CC9E8', '#F4B6B0', '#F2E3B3'];
 const tint = (id) => TINTS[Number(id) % TINTS.length];
-const category = (e) => ({ '🍊': '과일', '🐖': '육류', '🐟': '수산' }[e] || '간식·가공');
+const category = (e) => ({ '🍊': '과일', '🥕': '채소·곡물', '🌾': '채소·곡물', '🐖': '육류', '🐟': '수산', '🦑': '수산', '🐚': '수산' }[e] || '간식·가공');
+const catOf = (p) => p.category || category(p.emoji);
+// 카테고리 표기·순서는 public/data/products.json 의 meta.categories 와 같게 유지한다
+const CAT_ORDER = ['과일', '채소·곡물', '육류', '수산', '간식·가공'];
+const sortCats = (cs) => [...cs].sort((a, b) => (CAT_ORDER.indexOf(a) + 1 || 99) - (CAT_ORDER.indexOf(b) + 1 || 99));
 function toast(msg, err) {
   const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
   $('#toasts').append(t); setTimeout(() => t.remove(), 3000);
@@ -468,7 +473,11 @@ function art(p) {
   const n = p.name || ''; let g;
   switch (p.emoji) {
     case '🍊': {
-      const c = n.includes('천혜향') ? '#FF6B35' : '#FF9A1F';
+      if (n.includes('3종')) {
+        g = `<circle cx="38" cy="76" r="22" fill="#FF9A1F" ${s}/><circle cx="82" cy="76" r="22" fill="#FF6B35" ${s}/><circle cx="60" cy="48" r="22" fill="#E8432B" ${s}/><path d="M60 28c2-9 10-12 18-9-2 9-10 12-18 9z" fill="#43A047" ${s}/>`; break;
+      }
+      const COL = { '천혜향': '#FF6B35', '레드향': '#E8432B', '황금향': '#FFB300' };
+      const c = COL[Object.keys(COL).find((k) => n.includes(k))] || '#FF9A1F';
       g = `<circle cx="60" cy="68" r="34" fill="${c}" ${s}/>${n.includes('한라봉') ? `<path d="M50 36c0-8 20-8 20 0" fill="${c}" ${s}/>` : ''}
         <path d="M60 34c2-12 14-16 26-12-2 12-14 17-26 12z" fill="#43A047" ${s}/><path d="M40 64a22 22 0 0 1 14-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/>`; break;
     }
@@ -476,6 +485,9 @@ function art(p) {
       g = `<rect x="18" y="38" width="84" height="48" rx="18" fill="#F4A6A0" ${s}/><path d="M30 52c10-8 18 8 28 0s18 8 30 0M30 68c10-8 18 8 28 0s18 8 30 0" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`; break;
     case '🐟': {
       const silver = n.includes('갈치');
+      const pinkBody = (fill, extra = '') => `<path d="M16 60c14-24 52-26 70-6l20-14v40L86 66C68 86 30 84 16 60z" fill="${fill}" ${s}/><circle cx="32" cy="56" r="3.5" fill="${INK}"/>${extra}`;
+      if (n.includes('고등어')) { g = pinkBody('#6FA8B5', `<path d="M44 42l4 10M54 40l4 12M64 40l4 12M74 44l3 10" stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".55"/>`); break; }
+      if (n.includes('자리돔')) { g = `<g transform="translate(12 16) scale(.8)">${pinkBody('#9C6B4E', `<path d="M52 44c6 10 6 24 0 34" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".7"/>`)}</g>`; break; }
       g = silver
         ? `<path d="M10 62c20-18 56-20 80-4l16-12v32l-16-12c-24 16-60 14-80-4z" fill="#D5DEE4" ${s}/><circle cx="24" cy="60" r="3" fill="${INK}"/><path d="M40 52v20M54 50v22M68 52v18" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>`
         : `<path d="M16 60c14-24 52-26 70-6l20-14v40L86 66C68 86 30 84 16 60z" fill="#F58C8C" ${s}/><circle cx="32" cy="56" r="3.5" fill="${INK}"/><path d="M52 44c6 10 6 24 0 34M66 46c5 8 5 20 0 30" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>`;
@@ -492,6 +504,22 @@ function art(p) {
       g = `<path d="M18 54h84a42 36 0 0 1-84 0z" fill="#8DBF6A" ${s}/><ellipse cx="60" cy="54" rx="42" ry="9" fill="#C9E4A8" ${s}/><path d="M46 38c-6-6 6-10 0-18M62 38c-6-6 6-10 0-18M78 38c-6-6 6-10 0-18" fill="none" ${s}/>`; break;
     case '🥣':
       g = `<path d="M16 58h88a44 36 0 0 1-88 0z" fill="#E8663C" ${s}/><ellipse cx="60" cy="58" rx="44" ry="10" fill="#7A4B2A" ${s}/><g fill="#2E6B3A"><ellipse cx="46" cy="58" rx="7" ry="3"/><ellipse cx="68" cy="60" rx="8" ry="3"/><ellipse cx="82" cy="56" rx="5" ry="2.5"/></g><path d="M78 22l18 30M88 20l16 30" ${s}/>`; break;
+    case '🥕':
+      g = `<path d="M26 40c24-10 58 12 68 40 4 12-8 18-18 10C52 78 30 62 26 40z" fill="#FF8A1F" ${s}/><path d="M44 52l10-4M58 62l10-4M70 74l9-3" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" opacity=".5"/><path d="M26 40c-8-10-6-20 2-24 2 8 6 14 12 18M26 40c-12 0-18-8-18-16 8-2 14 4 18 16" fill="#43A047" ${s}/>`; break;
+    case '🌾':
+      g = `<path d="M32 36h56l6 54H26z" fill="#F7ECD6" ${s}/><path d="M32 36l6-14h44l6 14" fill="#E9D7B0" ${s}/><circle cx="60" cy="64" r="15" fill="#8A6B4A" ${s}/><path d="M60 76V52M52 60l8-6 8 6M52 68l8-6 8 6" fill="none" stroke="#F7ECD6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`; break;
+    case '🦑':
+      g = `<path d="M60 14c18 14 24 36 16 56H44c-8-20-2-42 16-56z" fill="#F4A6A0" ${s}/><path d="M44 70c-2 14-8 20-14 24M53 70c0 14-2 22-4 28M67 70c0 14 2 22 4 28M76 70c2 14 8 20 14 24" fill="none" ${s}/><circle cx="53" cy="48" r="3" fill="${INK}"/><circle cx="67" cy="48" r="3" fill="${INK}"/><path d="M60 22v10" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/>`; break;
+    case '🐚':
+      g = `<ellipse cx="60" cy="64" rx="38" ry="32" fill="#EBC99A" ${s}/><path d="M60 64a4 4 0 0 1 8 0a10 10 0 0 1-20 0a18 18 0 0 1 36 0" fill="none" ${s}/><path d="M32 44l-8-8M44 34l-4-10M60 31V20" fill="none" ${s}/>`; break;
+    case '🍞':
+      g = `<path d="M22 66c0-20 16-32 38-32s38 12 38 32v22H22z" fill="#D9A066" ${s}/><path d="M42 46l8 14M58 42l8 16M76 46l8 12" stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".6"/>`; break;
+    case '🫓':
+      g = `<rect x="22" y="40" width="76" height="16" rx="8" fill="#F2E3B3" ${s}/><rect x="22" y="58" width="76" height="16" rx="8" fill="#F2E3B3" ${s}/><rect x="22" y="76" width="76" height="16" rx="8" fill="#F2E3B3" ${s}/><g fill="${INK}" opacity=".7"><circle cx="34" cy="48" r="1.8"/><circle cx="62" cy="49" r="1.8"/><circle cx="86" cy="48" r="1.8"/><circle cx="44" cy="66" r="1.8"/><circle cx="76" cy="66" r="1.8"/><circle cx="34" cy="84" r="1.8"/><circle cx="64" cy="85" r="1.8"/></g>`; break;
+    case '🧃':
+      g = `<path d="M38 34h44l4 60H34z" fill="${n.includes('한라봉') ? '#FFB300' : '#FF9A1F'}" ${s}/><path d="M38 34l6-12h32l6 12" fill="#FFF3DE" ${s}/><path d="M68 22V12h14" fill="none" ${s}/><circle cx="60" cy="64" r="13" fill="#FFF3DE" ${s}/><path d="M60 54v20M50 64h20" stroke="#FF9A1F" stroke-width="2.5"/>`; break;
+    case '🍯':
+      g = `<path d="M32 46h56v42a10 10 0 0 1-10 10H42a10 10 0 0 1-10-10z" fill="#E8A23A" ${s}/><rect x="30" y="30" width="60" height="16" rx="4" fill="#FF5A1F" ${s}/><circle cx="60" cy="72" r="14" fill="#FFF3DE" ${s}/><path d="M60 62v20M50 72h20" stroke="#FF8A1F" stroke-width="2.5"/>`; break;
     default:
       g = `<circle cx="60" cy="60" r="34" fill="#fff" ${s}/>`;
   }
@@ -507,13 +535,8 @@ const SB_URL = ENV.VITE_SUPABASE_URL || stored.url;
 const SB_KEY = ENV.VITE_SUPABASE_ANON_KEY || stored.key;
 const sb = SB_URL && SB_KEY ? createClient(SB_URL, SB_KEY) : null;
 
-const DEMO_PRODUCTS = [
-  [1, '한라봉 3kg', '달콤새콤 제주 한라봉 선물세트', '🍊', 28700], [2, '천혜향 2kg', '향이 진한 프리미엄 천혜향', '🍊', 34300],
-  [3, '흑돼지 오겹살 600g', '쫄깃고소한 제주 흑돼지 구이용', '🐖', 31900], [4, '옥돔 3마리', '제주 바다에서 잡은 손질 옥돔', '🐟', 45200],
-  [5, '갈치 2마리', '은빛 제주 은갈치 (대)', '🐟', 39800], [6, '제주 감귤 초콜릿', '감귤 풍미 가득한 수제 초콜릿', '🍫', 12600],
-  [7, '오메기떡 10개입', '쫀득한 제주 전통 오메기떡', '🍡', 17400], [8, '우도 땅콩 막걸리', '우도 땅콩으로 빚은 고소한 막걸리', '🍶', 9300],
-  [9, '제주 말차 세트', '제주 오설록 스타일 말차 티백 세트', '🍵', 21500], [10, '성게 미역국 세트', '제주 성게알이 듬뿍 든 간편 미역국', '🥣', 24900],
-].map(([id, name, description, emoji, price]) => ({ id, name, description, emoji, price }));
+// 상품 원본은 public/data/products.json 한 곳. 체험 모드는 이 파일을, Supabase 모드는 같은 내용을 넣은 products 테이블을 쓴다.
+const catalogUrl = new URL('data/products.json', document.baseURI);
 
 /* 체험 모드 인증: Supabase 없이도 가입·로그인이 실제로 동작한다. 계정과 데이터는 이 브라우저(localStorage)에만 저장된다. */
 async function hashPw(pw, salt) {
@@ -552,7 +575,11 @@ const demo = {
     this.user = u ? { id: u.id, name: u.name, email: u.email } : null;
     return this.user;
   },
-  async products() { return DEMO_PRODUCTS; },
+  async products() {
+    const r = await fetch(catalogUrl);
+    if (!r.ok) throw new Error('상품 데이터를 불러오지 못했어요');
+    return (await r.json()).products;
+  },
   async cart() { return load(this.uk('d_cart'), []); },
   async setCart(pid, qty) {
     const k = this.uk('d_cart'); let c = load(k, []); const i = c.findIndex((x) => x.product_id === pid);
@@ -638,19 +665,19 @@ function renderChrome() {
 }
 
 function renderShop() {
-  const cats = ['전체', ...new Set(S.products.map((p) => category(p.emoji)))];
+  const cats = ['전체', ...sortCats(new Set(S.products.map((p) => catOf(p))))];
   $('#chips').innerHTML = cats.map((c) => `<button class="chip ${c === S.cat ? 'on' : ''}" data-cat="${c}">${c}</button>`).join('');
-  let list = S.products.filter((p) => (S.cat === '전체' || category(p.emoji) === S.cat) && (p.name + (p.description || '')).includes(S.q));
+  let list = S.products.filter((p) => (S.cat === '전체' || catOf(p) === S.cat) && (p.name + (p.description || '')).includes(S.q));
   if (S.sort === 'asc') list = [...list].sort((a, b) => a.price - b.price);
   if (S.sort === 'desc') list = [...list].sort((a, b) => b.price - a.price);
   const g = $('#grid');
   if (S.loadingProducts) { g.innerHTML = '<div class="skeleton"></div>'.repeat(6); return; }
   if (S.loadError) { g.innerHTML = '<div class="empty">상품을 불러오지 못했어요.<br>Supabase 연결 설정(URL·키)과 네트워크를 확인해주세요.</div>'; return; }
-  if (!S.products.length) { g.innerHTML = '<div class="empty">상품이 없어요. Supabase SQL Editor에서 supabase/schema.sql을 실행했는지 확인해주세요.</div>'; return; }
+  if (!S.products.length) { g.innerHTML = '<div class="empty">상품이 없어요. Supabase SQL Editor에서 supabase/schema.sql 다음에 supabase/seed_products.sql까지 실행했는지 확인해주세요.</div>'; return; }
   if (!list.length) { g.innerHTML = '<div class="empty">찾는 상품이 없어요. 바람이 가져갔나 봐요.</div>'; return; }
   g.innerHTML = list.map((p) => `
     <article class="card">
-      <div class="thumb" style="background:${tint(p.id)}"><span class="no">No.${String(p.id).padStart(2, '0')}</span><span class="tag">${category(p.emoji)}</span>${art(p)}</div>
+      <div class="thumb" style="background:${tint(p.id)}"><span class="no">No.${String(p.id).padStart(2, '0')}</span><span class="tag">${catOf(p)}</span>${art(p)}</div>
       <div class="cbody"><h3>${esc(p.name)}</h3><p class="desc">${esc(p.description)}</p>
         <div class="cfoot"><span class="price">${Number(p.price).toLocaleString('ko-KR')}<small>원</small></span>
           <button class="add" data-action="add" data-id="${p.id}" aria-label="${esc(p.name)} 담기">${icon('plus')}</button></div></div>
@@ -697,7 +724,7 @@ function renderPosts() {
 /* hero marketing blocks: every number comes from the loaded product data */
 function renderHero() {
   const P = S.products; if (!P.length) return;
-  const cats = [...new Set(P.map((p) => category(p.emoji)))];
+  const cats = sortCats(new Set(P.map((p) => catOf(p))));
   const min = Math.min(...P.map((p) => p.price));
   $('#quick').innerHTML = `<span>바로가기</span>` + cats.map((c) => `<a class="qchip" href="#shop" data-cat="${c}">${c}</a>`).join('');
   $('#stats').innerHTML = `<div><b>${P.length}<small>종</small></b><span>제주 특산품</span></div>
@@ -842,7 +869,7 @@ const SUGGEST = ['주문은 어떻게 해요?', '반품하고 싶어요', '가�
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const productTokens = (p) => p.name.split(/\s+/).filter((t) => t.length >= 2 && !/^\d|제주|우도|세트|마리|개입/.test(t));
 const matchProducts = (q) => S.products.filter((p) => productTokens(p).some((t) => q.includes(t)));
-const catIn = (q) => (/과일/.test(q) ? '과일' : /수산|생선|해산물/.test(q) ? '수산' : /육류|고기|돼지/.test(q) ? '육류' : /간식|가공|디저트|막걸리/.test(q) ? '간식·가공' : null);
+const catIn = (q) => (/과일/.test(q) ? '과일' : /채소|야채|곡물/.test(q) ? '채소·곡물' : /수산|생선|해산물/.test(q) ? '수산' : /육류|고기|돼지/.test(q) ? '육류' : /간식|가공|디저트|막걸리/.test(q) ? '간식·가공' : null);
 const dayPick = (pool) => pool[Math.floor(Date.now() / 864e5) % pool.length];
 const line = (p) => `${p.name} — ${won(p.price)}`;
 const addBtn = (p) => ({ label: `${p.name} 담기`, action: 'add', id: p.id });
@@ -876,25 +903,27 @@ const INTENTS = [
     if (!S.products.length) return NO_DATA;
     const m = q.match(/(\d+(?:\.\d+)?)\s*만\s*원?/) || null;
     const budget = m ? Math.round(Number(m[1]) * 10000) : (q.match(/(\d{4,6})\s*원/) ? Number(q.match(/(\d{4,6})\s*원/)[1]) : 0);
-    const asc = [...S.products].sort((a, b) => a.price - b.price);
+    const c = catIn(q), pool = c ? S.products.filter((p) => catOf(p) === c) : S.products; // 카테고리를 함께 물으면 그 안에서만 찾는다
+    if (!pool.length) return NO_DATA;
+    const asc = [...pool].sort((a, b) => a.price - b.price), where = c ? `${c} 중 ` : '';
     if (budget) {
       const ok = asc.filter((p) => p.price <= budget).slice(0, 5);
-      return ok.length ? { text: `${won(budget)} 이하 상품이에요.\n` + ok.map(line).join('\n'), actions: ok.slice(0, 3).map(addBtn) }
-        : { text: `${won(budget)} 이하 상품은 없어요. 가장 저렴한 건 ${line(asc[0])}이에요.`, actions: [addBtn(asc[0])] };
+      return ok.length ? { text: `${where}${won(budget)} 이하 상품이에요.\n` + ok.map(line).join('\n'), actions: ok.slice(0, 3).map(addBtn) }
+        : { text: `${where}${won(budget)} 이하 상품은 없어요. 가장 저렴한 건 ${line(asc[0])}이에요.`, actions: [addBtn(asc[0])] };
     }
     const top = asc.slice(0, 3), max = asc[asc.length - 1];
-    return { text: '가장 저렴한 상품이에요.\n' + top.map(line).join('\n') + `\n\n가장 높은 가격은 ${line(max)}이에요.`, actions: top.slice(0, 2).map(addBtn) };
+    return { text: `${where}가장 저렴한 상품이에요.\n` + top.map(line).join('\n') + `\n\n${where}가장 높은 가격은 ${line(max)}이에요.`, actions: top.slice(0, 2).map(addBtn) };
   } },
   { name: 'recommend', test: (q) => /추천|뭐 살|선물|인기|뭐가 좋|고민/.test(q), reply(q) {
     if (!S.products.length) return NO_DATA;
-    const c = catIn(q), pool = c ? S.products.filter((p) => category(p.emoji) === c) : S.products;
+    const c = catIn(q), pool = c ? S.products.filter((p) => catOf(p) === c) : S.products;
     if (!pool.length) return { text: '해당하는 상품이 없어요.' };
     const pick = dayPick(pool), cheap = [...pool].sort((a, b) => a.price - b.price)[0];
     const acts = [addBtn(pick)]; if (cheap.id !== pick.id) acts.push(addBtn(cheap));
     return { text: `${c ? c + ' 중에서 ' : ''}오늘의 PICK은 ${line(pick)}이에요.\n${pick.description}` + (cheap.id !== pick.id ? `\n\n부담 없이 고르신다면 ${line(cheap)}도 있어요.` : '') + '\n\n(별도 판매 순위 자료가 없어서 오늘의 PICK은 날짜 기준으로 돌아가며 골라요.)', actions: acts };
   } },
   { name: 'category', test: (q) => !!catIn(q), reply(q) {
-    const c = catIn(q), ps = S.products.filter((p) => category(p.emoji) === c);
+    const c = catIn(q), ps = S.products.filter((p) => catOf(p) === c);
     return ps.length ? { text: `${c} 상품이에요.\n` + ps.map(line).join('\n'), actions: ps.slice(0, 3).map(addBtn) } : NO_DATA;
   } },
   { name: 'jejueo', test: (q) => /제주어|사투리|방언/.test(q), reply() {

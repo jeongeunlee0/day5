@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "제주상점 상품 데이터",
+    "version": 2,
+    "currency": "KRW",
+    "categories": ["과일", "채소·곡물", "육류", "수산", "간식·가공"],
+    "priceNote": "가격은 화면 구성을 위한 예시값이며 실제 시장 가격이 아닙니다.",
+    "descriptionNote": "설명은 웹 검색으로 확인한 일반적인 특징만 적었고, 당도·산지·수확일 같은 검증 불가한 주장은 넣지 않았습니다.",
+    "unverifiedExcluded": ["카라향", "전복", "오메기술", "고사리"],
+    "sources": [
+      "https://v.daum.net/v/UjrWCoDxCu",
+      "https://www.rda.go.kr/middlePopOpenPopNongsaroDBView.do?no=1825",
+      "https://www.localnaeil.com/News/View/641265"
+    ]
+  },
+  "products": [
+    { "id": 1, "name": "한라봉 3kg", "description": "달콤새콤 제주 한라봉 선물세트", "category": "과일", "emoji": "🍊", "price": 28700, "basis": "원본 데이터" },
+    { "id": 2, "name": "천혜향 2kg", "description": "향이 진한 프리미엄 천혜향", "category": "과일", "emoji": "🍊", "price": 34300, "basis": "원본 데이터" },
+    { "id": 3, "name": "흑돼지 오겹살 600g", "description": "쫄깃고소한 제주 흑돼지 구이용", "category": "육류", "emoji": "🐖", "price": 31900, "basis": "원본 데이터" },
+    { "id": 4, "name": "옥돔 3마리", "description": "제주 바다에서 잡은 손질 옥돔", "category": "수산", "emoji": "🐟", "price": 45200, "basis": "원본 데이터" },
+    { "id": 5, "name": "갈치 2마리", "description": "은빛 제주 은갈치 (대)", "category": "수산", "emoji": "🐟", "price": 39800, "basis": "원본 데이터" },
+    { "id": 6, "name": "제주 감귤 초콜릿", "description": "감귤 풍미 가득한 수제 초콜릿", "category": "간식·가공", "emoji": "🍫", "price": 12600, "basis": "원본 데이터" },
+    { "id": 7, "name": "오메기떡 10개입", "description": "쫀득한 제주 전통 오메기떡", "category": "간식·가공", "emoji": "🍡", "price": 17400, "basis": "원본 데이터" },
+    { "id": 8, "name": "우도 땅콩 막걸리", "description": "우도 땅콩으로 빚은 고소한 막걸리", "category": "간식·가공", "emoji": "🍶", "price": 9300, "basis": "원본 데이터" },
+    { "id": 9, "name": "제주 말차 세트", "description": "제주 오설록 스타일 말차 티백 세트", "category": "간식·가공", "emoji": "🍵", "price": 21500, "basis": "원본 데이터" },
+    { "id": 10, "name": "성게 미역국 세트", "description": "제주 성게알이 듬뿍 든 간편 미역국", "category": "간식·가공", "emoji": "🥣", "price": 24900, "basis": "원본 데이터" },
+
+    { "id": 11, "name": "레드향 2kg", "description": "과육이 부드럽고 껍질을 벗기기 쉬운 만감류", "category": "과일", "emoji": "🍊", "price": 33900, "basis": "만감류 설명 기사(과육·껍질 특징)" },
+    { "id": 12, "name": "황금향 2kg", "description": "11~12월 무렵 출하되는 만감류", "category": "과일", "emoji": "🍊", "price": 31500, "basis": "농촌진흥청 출하 시기 자료" },
+    { "id": 13, "name": "만감류 3종 세트", "description": "한라봉·천혜향·레드향을 한 상자에 담은 세트", "category": "과일", "emoji": "🍊", "price": 39900, "basis": "구성 상품(조사된 만감류 3종)" },
+    { "id": 14, "name": "구좌 당근 3kg", "description": "수분이 많고 달다는 평가를 받는 제주 당근", "category": "채소·곡물", "emoji": "🥕", "price": 15800, "basis": "구좌 당근 평가 기사" },
+    { "id": 15, "name": "제주 메밀가루 1kg", "description": "빙떡 같은 제주 향토 음식에 쓰는 메밀가루", "category": "채소·곡물", "emoji": "🌾", "price": 9800, "basis": "빙떡=메밀 향토음식" },
+    { "id": 16, "name": "흑돼지 목살 600g", "description": "제주 흑돼지 목살, 구이용", "category": "육류", "emoji": "🐖", "price": 29900, "basis": "제주 흑돼지 대표 먹거리" },
+    { "id": 17, "name": "고등어 3마리", "description": "제주 여행에서 손꼽히는 먹거리, 구이용 고등어", "category": "수산", "emoji": "🐟", "price": 18500, "basis": "제주 대표 먹거리 소개 기사" },
+    { "id": 18, "name": "한치 500g", "description": "여름철 제주 바다에서 잡히는 한치, 물회·튀김용", "category": "수산", "emoji": "🦑", "price": 22000, "basis": "7대 향토음식(한치물회)" },
+    { "id": 19, "name": "자리돔 1kg", "description": "5~8월 제주 연안에서 잡히는 자리돔", "category": "수산", "emoji": "🐟", "price": 16500, "basis": "7대 향토음식(자리돔물회)" },
+    { "id": 20, "name": "제주 소라 500g", "description": "해산물 요리 재료로 쓰는 제주 소라", "category": "수산", "emoji": "🐚", "price": 14800, "basis": "제주 해산물 재료 소개" },
+    { "id": 21, "name": "제주 보리빵 6개입", "description": "보리로 만든 제주 향토 빵", "category": "간식·가공", "emoji": "🍞", "price": 11500, "basis": "제주 보리빵 소개" },
+    { "id": 22, "name": "빙떡 8개입", "description": "메밀로 부친 제주 향토 떡", "category": "간식·가공", "emoji": "🫓", "price": 13900, "basis": "7대 향토음식(빙떡)" },
+    { "id": 23, "name": "감귤 주스 1L", "description": "감귤을 담은 주스", "category": "간식·가공", "emoji": "🧃", "price": 7900, "basis": "감귤 가공품(주스)" },
+    { "id": 24, "name": "한라봉 주스 1L", "description": "한라봉을 담은 주스", "category": "간식·가공", "emoji": "🧃", "price": 9900, "basis": "감귤 가공품(한라봉 주스)" },
+    { "id": 25, "name": "한라봉차 20개입", "description": "따뜻하게 타 마시는 한라봉 차", "category": "간식·가공", "emoji": "🍵", "price": 12500, "basis": "감귤 가공품(한라봉 차)" },
+    { "id": 26, "name": "감귤잼 250g", "description": "빵에 발라 먹는 감귤 잼", "category": "간식·가공", "emoji": "🍯", "price": 6900, "basis": "감귤 가공품(잼)" },
+    { "id": 27, "name": "감귤 막걸리 750ml", "description": "감귤 풍미를 더한 막걸리", "category": "간식·가공", "emoji": "🍶", "price": 8500, "basis": "감귤 가공품(막걸리)" },
+    { "id": 28, "name": "제주 고기국수 2인분", "description": "제주 7대 향토음식에 꼽히는 고기국수", "category": "간식·가공", "emoji": "🥣", "price": 12900, "basis": "7대 향토음식(고기국수)" }
+  ]
+}

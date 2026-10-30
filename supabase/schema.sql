@@ -3,6 +3,7 @@ create table if not exists products (
   id          bigint generated always as identity primary key,
   name        text    not null,
   description text,
+  category    text    not null check (category in ('과일', '채소·곡물', '육류', '수산', '간식·가공')),
   emoji       text,
   price       integer not null check (price > 0),
   created_at  timestamptz default now()
@@ -79,15 +80,5 @@ create policy "likes read"   on guestbook_likes for select using (true);
 create policy "likes insert" on guestbook_likes for insert with check (auth.uid() = user_id);
 create policy "likes delete" on guestbook_likes for delete using (auth.uid() = user_id);
 
--- 6. 상품 샘플 데이터 (가격은 임의 설정)
-insert into products (name, description, emoji, price) values
-  ('한라봉 3kg',         '달콤새콤 제주 한라봉 선물세트',     '🍊', 28700),
-  ('천혜향 2kg',         '향이 진한 프리미엄 천혜향',         '🍊', 34300),
-  ('흑돼지 오겹살 600g', '쫄깃고소한 제주 흑돼지 구이용',     '🐖', 31900),
-  ('옥돔 3마리',         '제주 바다에서 잡은 손질 옥돔',      '🐟', 45200),
-  ('갈치 2마리',         '은빛 제주 은갈치 (대)',             '🐟', 39800),
-  ('제주 감귤 초콜릿',   '감귤 풍미 가득한 수제 초콜릿',      '🍫', 12600),
-  ('오메기떡 10개입',    '쫀득한 제주 전통 오메기떡',         '🍡', 17400),
-  ('우도 땅콩 막걸리',   '우도 땅콩으로 빚은 고소한 막걸리',  '🍶',  9300),
-  ('제주 말차 세트',     '제주 오설록 스타일 말차 티백 세트', '🍵', 21500),
-  ('성게 미역국 세트',   '제주 성게알이 듬뿍 든 간편 미역국', '🥣', 24900);
+-- 6. 상품 데이터는 supabase/seed_products.sql 을 이어서 실행하세요.
+--    (public/data/products.json 에서 `node scripts/products.mjs sql` 로 만든 파일이라 화면의 체험 모드와 같은 28개 상품이에요.)
