@@ -1,13 +1,903 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>day5</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23FF5A1F'/%3E%3Ccircle cx='16' cy='16' r='11' fill='%23FFF3DE'/%3E%3Cpath d='M16 6v20M6 16h20M9 9l14 14M23 9L9 23' stroke='%23FF5A1F' stroke-width='1.6'/%3E%3C/svg%3E" />
+<title>제주상점 — 제주에서 바로 온 선물</title>
+<style>
+  @font-face { font-family: "Gmarket Sans"; font-weight: 500; font-display: swap; src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format("woff"); }
+  @font-face { font-family: "Gmarket Sans"; font-weight: 700; font-display: swap; src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff") format("woff"); }
+  :root {
+    --font: "Gmarket Sans", "Malgun Gothic", system-ui, sans-serif;
+    --paper: #F6F0E4; --cream: #FFF3DE; --ink: #12201F; --teal: #0B3B3C;
+    --tang: #FF5A1F; --sun: #FFC21A; --mint: #B9DCC9; --muted: #44524f;
+    --bd: 1.5px solid var(--ink);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font); font-weight: 500; color: var(--ink); line-height: 1.7; font-size: 16px; word-break: keep-all; overflow-wrap: break-word; background: var(--teal); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-weight: 700; letter-spacing: -.025em; line-height: 1.3; text-wrap: balance; }
+  p, .desc, .hint, small { font-weight: 500; line-height: 1.65; text-wrap: pretty; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+  input, select, textarea { font: inherit; font-size: 1rem; color: inherit; }
+  .i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .i.fill { fill: currentColor; stroke: none; }
+  #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  main, header, footer { position: relative; z-index: 1; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+  /* header */
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 10px; padding: 14px clamp(16px, 4vw, 48px); color: var(--cream); transition: background .25s, color .25s; }
+  header.solid { background: var(--paper); color: var(--ink); border-bottom: var(--bd); padding-block: 10px; }
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 1.3rem; letter-spacing: -.03em; }
+  .logo svg { width: 30px; height: 30px; }
+  .mode { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid currentColor; border-radius: 999px; padding: 1px 9px; opacity: .8; }
+  .spacer { flex: 1; }
+  .hbtn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; font-size: .92rem; transition: background .2s; }
+  .hbtn:hover { background: rgba(255,255,255,.14); }
+  header.solid .hbtn:hover { background: rgba(18,32,31,.08); }
+  .cartbtn { display: inline-flex; align-items: center; gap: 8px; background: var(--tang); color: #fff; padding: 9px 16px; border-radius: 999px; font-weight: 700; font-size: .92rem; transition: background .2s, color .2s; }
+  .cartbtn:hover { background: var(--sun); color: var(--ink); }
+  .badge { background: var(--ink); color: #fff; border-radius: 999px; min-width: 22px; height: 22px; display: grid; place-items: center; font-size: .82rem; padding: 0 6px; }
+  .badge.bump { animation: bump .45s; }
+  @keyframes bump { 40% { transform: scale(1.5); } }
+
+  /* hero */
+  .hero { min-height: 100vh; display: flex; align-items: center; padding: 120px clamp(20px, 7vw, 110px) 90px; color: var(--cream); position: relative; }
+  .hero-copy { max-width: 580px; }
+  .eyebrow { background: var(--teal); display: inline-flex; gap: 8px; align-items: center; font-size: .84rem; letter-spacing: .16em; text-transform: uppercase; border: 1.5px solid var(--cream); border-radius: 999px; padding: 5px 14px; }
+  .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--tang); }
+  .tags { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .greet { background: var(--sun); color: var(--ink); font-weight: 700; font-size: .92rem; padding: 5px 14px; border-radius: 999px; transform: rotate(-3deg); display: inline-flex; gap: 8px; align-items: baseline; }
+  .greet small { font-weight: 500; font-size: .82rem; }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 24px; font-size: .88rem; }
+  .quick > span { opacity: .9; letter-spacing: .12em; margin-right: 4px; }
+  .qchip { padding: 5px 14px; border: 1.5px solid var(--cream); border-radius: 999px; transition: background .2s, color .2s; }
+  .qchip:hover { background: var(--cream); color: var(--ink); }
+  .stats { display: flex; gap: clamp(18px, 4vw, 40px); margin-top: 26px; padding-top: 20px; border-top: 1.5px solid rgba(255,243,222,.3); }
+  .stats b { display: block; font-size: 1.7rem; line-height: 1.1; letter-spacing: -.03em; }
+  .stats b small { font-size: .92rem; font-weight: 500; margin-left: 2px; }
+  .stats span { font-size: .84rem; opacity: .9; font-weight: 500; }
+  .spot { position: absolute; right: clamp(20px, 7vw, 110px); bottom: 64px; width: 310px; background: var(--cream); color: var(--ink); border: var(--bd); border-radius: 22px; padding: 14px; display: none; grid-template-columns: 84px 1fr; gap: 14px; align-items: center; box-shadow: 7px 7px 0 var(--tang); }
+  @media (min-width: 1100px) { .spot:not([hidden]) { display: grid; } }
+  .spot-tag { position: absolute; top: -13px; left: 16px; background: var(--ink); color: var(--cream); font-size: .8rem; letter-spacing: .12em; padding: 2px 12px; border-radius: 999px; }
+  .spot-art { width: 84px; height: 84px; border-radius: 16px; border: var(--bd); display: grid; place-items: center; }
+  .spot-art .art { width: 62px; height: 62px; }
+  .spot b.n { display: block; font-size: 1rem; line-height: 1.3; }
+  .spot small { display: block; color: var(--muted); font-size: .84rem; line-height: 1.4; margin: 2px 0 8px; }
+  .spot .row { display: flex; align-items: center; justify-content: space-between; }
+  .spot .row b { font-size: 1.1rem; }
+  .spot .add { width: 38px; height: 38px; }
+  .band.teal { background: var(--teal); color: var(--cream); border-top: 1.5px solid var(--cream); }
+  .band.teal .sec-head p { color: rgba(255,243,222,.92); }
+  .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .word { background: var(--cream); color: var(--ink); border: var(--bd); border-radius: 20px; padding: 22px 22px 20px; transition: transform .25s, box-shadow .25s; box-shadow: 0 0 0 var(--tang); }
+  .word:nth-child(even) { background: var(--sun); }
+  .word:hover { transform: translate(-4px, -4px) rotate(-1deg); box-shadow: 8px 8px 0 var(--tang); }
+  .word .w { font-size: 1.9rem; font-weight: 700; letter-spacing: -.04em; line-height: 1.15; }
+  .word .m { display: inline-block; margin: 8px 0 12px; padding: 1px 12px; border: 1.5px solid var(--ink); border-radius: 999px; font-size: .88rem; background: var(--paper); }
+  .word .j { font-size: .95rem; font-weight: 500; }
+  .note { margin-top: 22px; font-size: .88rem; opacity: .9; max-width: 640px; }
+  .title3d { width: min(100%, 580px); aspect-ratio: 3.2; margin: 8px 0 0; display: grid; place-items: center; font-size: clamp(2.8rem, 11vw, 5.6rem); font-weight: 700; color: var(--cream); letter-spacing: -.04em; }
+  .title3d.gl { color: transparent; }
+  .hero h1 { font-size: clamp(1.5rem, 3.2vw, 2.2rem); margin: 4px 0 12px; }
+  .hero h1 em { font-style: normal; color: var(--tang); white-space: nowrap; }
+  .hero p { max-width: 460px; opacity: 1; font-size: 1.05rem; }
+  .cta { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 26px; border-radius: 999px; font-weight: 700; border: 1.5px solid transparent; transition: transform .2s, box-shadow .2s, background .2s, color .2s; }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--tang); color: #fff; }
+  .btn.primary:hover { background: var(--sun); color: var(--ink); transform: translateY(-2px); }
+  .btn.ghost { border-color: var(--cream); color: var(--cream); }
+  .btn.ghost:hover { background: var(--cream); color: var(--ink); }
+  .btn.dark { background: var(--ink); color: #fff; }
+  .btn.dark:hover { background: var(--tang); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .scrollhint { position: absolute; bottom: 24px; left: clamp(20px, 7vw, 110px); font-size: .8rem; letter-spacing: .22em; opacity: .9; display: flex; align-items: center; gap: 10px; }
+  .scrollhint::after { content: ""; width: 40px; height: 1.5px; background: currentColor; animation: grow 2s ease-in-out infinite; transform-origin: left; }
+  @keyframes grow { 50% { transform: scaleX(.3); } }
+
+  /* marquee + USP */
+  .marquee { background: var(--tang); color: var(--ink); border-block: var(--bd); overflow: hidden; white-space: nowrap; padding: 14px 0; font-weight: 700; font-size: 1.25rem; }
+  .track { display: inline-flex; gap: 28px; animation: roll 32s linear infinite; padding-right: 28px; }
+  .track span { display: inline-flex; align-items: center; gap: 28px; }
+  @keyframes roll { to { transform: translateX(-50%); } }
+  .band { background: var(--paper); padding: clamp(48px, 7vw, 96px) clamp(16px, 5vw, 72px); }
+  .band.mint { background: var(--mint); border-top: var(--bd); }
+  .usp { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0; border: var(--bd); border-radius: 22px; overflow: hidden; background: var(--cream); margin-bottom: clamp(48px, 7vw, 88px); }
+  .usp div { padding: 22px 26px; display: flex; gap: 16px; align-items: center; border-right: var(--bd); }
+  .usp div:last-child { border-right: 0; }
+  .usp .ic { width: 48px; height: 48px; border-radius: 50%; background: var(--sun); border: var(--bd); display: grid; place-items: center; font-size: 1.3rem; flex: none; }
+  .usp b { display: block; }
+  .usp small { color: var(--muted); }
+
+  .sec-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+  .kicker { font-size: .84rem; letter-spacing: .18em; color: var(--tang); font-weight: 700; margin-bottom: 8px; }
+  .sec-head h2 { font-size: clamp(2rem, 5vw, 3.4rem); }
+  .sec-head p { color: var(--muted); max-width: 340px; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 28px; }
+  .chip { padding: 8px 18px; border-radius: 999px; border: var(--bd); background: transparent; font-weight: 500; transition: all .2s; }
+  .chip:hover { background: var(--cream); }
+  .chip.on { background: var(--ink); color: var(--cream); }
+  .field { padding: 10px 16px; border-radius: 999px; border: var(--bd); background: #fff; outline: none; }
+  .field:focus { box-shadow: 3px 3px 0 var(--ink); }
+  .sbox { position: relative; display: inline-flex; align-items: center; }
+  .sbox .i { position: absolute; left: 13px; pointer-events: none; }
+  .sbox .field { padding-left: 38px; }
+  .tools .spacer { flex: 1; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
+  .card { background: #fff; border: var(--bd); border-radius: 20px; overflow: hidden; transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column; }
+  .card:hover { transform: translate(-4px, -4px); box-shadow: 8px 8px 0 var(--ink); }
+  .thumb { height: 210px; display: grid; place-items: center; position: relative; border-bottom: var(--bd); }
+  .thumb .art { width: 142px; height: 142px; transition: transform .4s cubic-bezier(.3,1.4,.5,1); }
+  .card:hover .art { transform: rotate(-7deg) scale(1.1); }
+  .no { position: absolute; top: 14px; left: 16px; font-size: .84rem; letter-spacing: .12em; font-weight: 700; }
+  .tag { position: absolute; top: 12px; right: 12px; border: 1.5px solid var(--ink); border-radius: 999px; padding: 0 11px; font-size: .8rem; background: var(--paper); }
+  .cbody { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+  .cbody h3 { font-size: 1.12rem; }
+  .cbody .desc { color: var(--muted); font-size: .92rem; margin: 4px 0 16px; flex: 1; }
+  .cfoot { display: flex; align-items: center; justify-content: space-between; }
+  .price { font-weight: 700; font-size: 1.18rem; }
+  .price small { font-size: .88rem; font-weight: 500; margin-left: 1px; }
+  .add { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; transition: background .2s, transform .2s; }
+  .add:hover { background: var(--tang); transform: rotate(90deg); }
+  .skeleton { height: 360px; border-radius: 20px; border: var(--bd); background: linear-gradient(100deg, #efe6d3 30%, #f9f2e4 50%, #efe6d3 70%); background-size: 300% 100%; animation: shine 1.4s infinite; }
+  @keyframes shine { to { background-position: -150% 0; } }
+  .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 48px 10px; border: 1.5px dashed var(--ink); border-radius: 20px; }
+
+  /* guestbook */
+  .gb-form { display: grid; gap: 10px; background: #fff; border: var(--bd); border-radius: 20px; padding: 18px; margin-bottom: 26px; box-shadow: 6px 6px 0 var(--ink); }
+  .gb-form textarea { width: 100%; min-height: 84px; resize: vertical; border: 0; outline: none; background: transparent; }
+  .gb-form .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+  .post { background: #fff; border: var(--bd); border-radius: 20px; padding: 18px 20px; }
+  .post:nth-child(3n+2) { background: var(--cream); }
+  .post:nth-child(3n) { background: var(--sun); }
+  .post .meta { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: .88rem; color: var(--muted); }
+  .post:nth-child(3n) .meta { color: var(--ink); opacity: .85; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--teal); color: var(--cream); font-weight: 700; margin-right: 9px; }
+  .post .who { display: flex; align-items: center; color: var(--ink); font-weight: 700; font-size: .95rem; }
+  .post p { margin: 12px 0; white-space: pre-wrap; word-break: break-word; font-weight: 500; }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px; border: var(--bd); font-size: .88rem; transition: all .2s; background: transparent; }
+  .pill:hover { background: var(--ink); color: #fff; }
+  .pill.liked { background: var(--tang); color: #fff; border-color: var(--ink); }
+  .pill.liked .i { fill: currentColor; }
+  .comments { margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--ink); display: grid; gap: 8px; }
+  .comment { background: rgba(18,32,31,.07); padding: 8px 12px; border-radius: 12px; font-size: .92rem; display: flex; justify-content: space-between; gap: 10px; }
+  .comment b { margin-right: 6px; }
+  .cform { display: flex; gap: 8px; }
+  .cform input { flex: 1; min-width: 0; padding: 7px 14px; }
+
+  /* drawers / modal */
+  .scrim { position: fixed; inset: 0; background: rgba(11,59,60,.6); opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40; }
+  .scrim.show { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); background: var(--paper); z-index: 50; display: flex; flex-direction: column; border-left: var(--bd);
+    transform: translateX(105%); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+  .drawer.show { transform: none; }
+  .dhead { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: var(--bd); }
+  .dhead h3 { font-size: 1.35rem; display: flex; align-items: center; gap: 10px; }
+  .x { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; border: var(--bd); transition: background .2s; }
+  .x:hover { background: var(--ink); color: #fff; }
+  .dbody { flex: 1; overflow: auto; padding: 18px 24px; display: grid; gap: 12px; align-content: start; }
+  .dfoot { padding: 18px 24px 24px; border-top: var(--bd); display: grid; gap: 14px; background: var(--cream); }
+  .total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; }
+  .line { display: grid; grid-template-columns: 62px 1fr auto; gap: 14px; align-items: center; background: #fff; border: var(--bd); border-radius: 16px; padding: 10px; }
+  .line .em { width: 62px; height: 62px; border-radius: 12px; display: grid; place-items: center; border: var(--bd); }
+  .line .em .art { width: 46px; height: 46px; }
+  .line small { color: var(--muted); }
+  .qty { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty button { width: 26px; height: 26px; border-radius: 50%; border: var(--bd); display: grid; place-items: center; font-size: .88rem; }
+  .qty button:hover { background: var(--ink); color: #fff; }
+  .rm { color: var(--muted); font-size: .88rem; text-decoration: underline; text-underline-offset: 3px; }
+  .status { font-size: .8rem; padding: 2px 10px; border-radius: 999px; font-weight: 700; border: 1.5px solid var(--ink); }
+  .status.ordered { background: var(--mint); }
+  .status.returned { background: #e6e1d6; color: var(--muted); }
+  .modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 60; pointer-events: none; }
+  .mbox { width: min(420px, calc(100% - 28px)); background: var(--paper); border: var(--bd); border-radius: 26px; padding: 28px; box-shadow: 10px 10px 0 var(--ink);
+    opacity: 0; transform: translateY(24px) scale(.96); transition: all .3s; pointer-events: none; }
+  .modal.show .mbox { opacity: 1; transform: none; pointer-events: auto; }
+  .tabs { display: flex; gap: 0; border: var(--bd); border-radius: 999px; margin: 16px 0 18px; overflow: hidden; }
+  .tabs button { flex: 1; padding: 9px; font-weight: 700; }
+  .tabs button.on { background: var(--ink); color: var(--cream); }
+  .mbox form { display: grid; gap: 10px; }
+  .mbox .field { border-radius: 14px; width: 100%; }
+  .hint { font-size: .88rem; color: var(--muted); }
+  .toasts { position: fixed; top: 76px; left: 16px; right: 16px; z-index: 90; display: grid; gap: 8px; justify-items: center; pointer-events: none; }
+  .toast { background: var(--ink); max-width: 100%; text-align: center; color: var(--cream); padding: 12px 22px; border-radius: 999px; font-weight: 500; border: 1.5px solid var(--cream); box-shadow: 0 10px 0 -4px rgba(0,0,0,.25); animation: tin .35s, tout .35s 2.6s forwards; }
+  .toast.err { background: #b3261e; }
+  @keyframes tin { from { opacity: 0; transform: translateY(-14px); } }
+  @keyframes tout { to { opacity: 0; transform: translateY(-8px); } }
+  .fly { position: fixed; z-index: 100; width: 64px; height: 64px; border-radius: 50%; background: var(--sun); border: var(--bd); pointer-events: none; display: grid; place-items: center; }
+  .fly .art { width: 44px; height: 44px; }
+
+  footer { background: var(--ink); color: var(--cream); padding: clamp(40px, 6vw, 80px) clamp(16px, 5vw, 72px) 28px; overflow: hidden; }
+  .big { font-size: clamp(3.4rem, 17vw, 13rem); font-weight: 700; letter-spacing: -.05em; line-height: 1; color: var(--tang); }
+  .fmeta { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 26px; padding-top: 18px; border-top: 1.5px solid rgba(255,243,222,.25); font-size: .92rem; opacity: .95; }
+  footer button { text-decoration: underline; text-underline-offset: 3px; }
+  .reveal > * { opacity: 0; transform: translateY(28px); transition: opacity .7s, transform .7s; }
+  .reveal.in > * { opacity: 1; transform: none; }
+  .reveal.in > :nth-child(2) { transition-delay: .08s; } .reveal.in > :nth-child(3) { transition-delay: .16s; } .reveal.in > :nth-child(4) { transition-delay: .24s; }
+  @media (max-width: 720px) {
+    .lb, .mode, .navlink, .quick { display: none; }
+    header { padding-inline: 14px; gap: 4px; }
+    .cta { flex-wrap: nowrap; gap: 8px; }
+    .cta .btn { flex: 1; padding: 13px 8px; font-size: .95rem; white-space: nowrap; }
+    .stats { margin-top: 20px; }
+    .hero { align-items: flex-end; padding-bottom: 90px; }
+    .hero-copy { text-align: center; margin: 0 auto; }
+    .title3d { margin-inline: auto; }
+    .cta { justify-content: center; }
+    .hero p { margin: 0 auto; }
+    .scrollhint { display: none; }
+    .usp div { border-right: 0; border-bottom: var(--bd); }
+    .usp div:last-child { border-bottom: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5V8zM3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 10h5l3 3v3h-8"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15zM5 19l8-8"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M4.5 14a8 8 0 1 0 2-7.5L4 10"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1l2.8 8.2L23 12l-8.2 2.8L12 23l-2.8-8.2L1 12l8.2-2.8z"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#FF5A1F"/><circle cx="16" cy="16" r="11" fill="#FFF3DE"/><path d="M16 6v20M6 16h20M9 9l14 14M23 9L9 23" stroke="#FF5A1F" stroke-width="1.6" fill="none"/><circle cx="16" cy="16" r="2.4" fill="#FF5A1F"/></symbol>
+</svg>
+
+<canvas id="bg"></canvas>
+
+<header id="hdr">
+  <a class="logo" href="#top"><svg><use href="#i-logo"/></svg>제주상점</a>
+  <span class="mode" id="mode"></span>
+  <span class="spacer"></span>
+  <a class="hbtn navlink" href="#shop">상점</a>
+  <a class="hbtn navlink" href="#jejueo">제주어</a>
+  <a class="hbtn navlink" href="#guestbook">방명록</a>
+  <button class="hbtn" data-action="open-orders" aria-label="주문내역"><svg class="i"><use href="#i-box"/></svg><span class="lb">주문내역</span></button>
+  <button class="hbtn" data-action="auth" id="authbtn" aria-label="계정"></button>
+  <button class="cartbtn" data-action="open-cart" aria-label="장바구니"><svg class="i"><use href="#i-bag"/></svg><span class="badge" id="count">0</span></button>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="tags"><span class="eyebrow">Jeju Direct Market</span><span class="greet">혼저 옵서예 <small>어서 오세요</small></span></div>
+      <div class="title3d" id="title3d" role="img" aria-label="제주상점">제주상점</div>
+      <h1>제주의 맛을 <em>클릭 한 번</em>에, 한 상자로</h1>
+      <p>한라봉·천혜향 같은 과일부터 옥돔·갈치, 오메기떡까지. 마음에 드는 걸 담고 바로 주문하세요.</p>
+      <div class="cta">
+        <a class="btn primary" href="#shop">지금 쇼핑하기 <svg class="i"><use href="#i-arrow"/></svg></a>
+        <a class="btn ghost" href="#jejueo">제주어 한 마디</a>
+      </div>
+      <div class="quick" id="quick"></div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <aside class="spot" id="spot" hidden></aside>
+    <span class="scrollhint">SCROLL</span>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="track" id="track"></div></div>
+
+  <section class="band reveal" id="shop">
+    <div class="usp">
+      <div><span class="ic"><svg class="i"><use href="#i-leaf"/></svg></span><span><b>제주 특산 한곳에서</b><small>과일·수산·육류·간식을 모아봤어요</small></span></div>
+      <div><span class="ic"><svg class="i"><use href="#i-bag"/></svg></span><span><b>담고 바로 주문</b><small>장바구니에서 한 번에 주문</small></span></div>
+      <div><span class="ic"><svg class="i"><use href="#i-return"/></svg></span><span><b>간편 반품</b><small>주문내역에서 바로 신청</small></span></div>
+    </div>
+    <div class="sec-head">
+      <div><div class="kicker">01 — SHOP</div><h2>오늘의 제주</h2></div>
+      <p>산지에서 바로 보내는 제철 먹거리를 골라보세요.</p>
+    </div>
+    <div class="tools">
+      <div id="chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      <span class="spacer"></span>
+      <label class="sbox"><svg class="i"><use href="#i-search"/></svg><input class="field" id="q" type="search" placeholder="상품 검색" /></label>
+      <select class="field" id="sort" aria-label="정렬">
+        <option value="id">기본순</option><option value="asc">낮은 가격순</option><option value="desc">높은 가격순</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="band teal reveal" id="jejueo">
+    <div class="sec-head">
+      <div><div class="kicker">02 — 제주어 한 마디</div><h2>혼저 옵서예,<br />오늘의 제주어</h2></div>
+      <p>쇼핑하다 한 번쯤 써먹을 수 있는(?) 제주어 여섯 마디. 써먹는 건 자유, 책임은 본인 몫입니다.</p>
+    </div>
+    <div class="words" id="words"></div>
+    <p class="note">※ 제주어는 지역과 세대에 따라 표기와 쓰임이 조금씩 달라질 수 있어요. 여기 적은 뜻은 일반적으로 알려진 의미이며, 정확한 표기와 풀이는 제주특별자치도 『제주어사전』을 참고해 주세요.</p>
+  </section>
+
+  <section class="band mint reveal" id="guestbook">
+    <div class="sec-head">
+      <div><div class="kicker">03 — GUESTBOOK</div><h2>방명록</h2></div>
+      <p>제주의 맛, 어떠셨나요? 한 줄 남겨주세요.</p>
+    </div>
+    <form class="gb-form" id="gbform">
+      <textarea id="gbtext" placeholder="한라봉 한 상자 앞에서 이성을 잃었다면, 여기에 고백하세요" maxlength="300" required></textarea>
+      <div class="row"><span class="hint" id="gbwho"></span><button class="btn dark" style="padding:10px 22px">남기기</button></div>
+    </form>
+    <div class="posts" id="posts"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="big">제주상점</div>
+  <div class="fmeta">
+    <span>폭삭 속았수다 — 오늘도 수고하셨습니다 · © 제주상점 · 저장소 <span id="storage"></span></span>
+    <button data-action="settings">Supabase 연결 설정</button>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" data-action="close"></div>
+
+<aside class="drawer" id="cartdrawer">
+  <div class="dhead"><h3><svg class="i"><use href="#i-bag"/></svg>장바구니</h3><button class="x" data-action="close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="dbody" id="cartbody"></div>
+  <div class="dfoot"><div class="total"><span>합계</span><span id="carttotal">0원</span></div><button class="btn primary" id="checkout" data-action="checkout">주문하기 <svg class="i"><use href="#i-arrow"/></svg></button></div>
+</aside>
+
+<aside class="drawer" id="ordersdrawer">
+  <div class="dhead"><h3><svg class="i"><use href="#i-box"/></svg>주문내역</h3><button class="x" data-action="close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="dbody" id="ordersbody"></div>
+</aside>
+
+<div class="modal" id="authmodal"><div class="mbox">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1.5rem">제주상점 시작하기</h3><button class="x" data-action="close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="tabs"><button class="on" data-tab="in">로그인</button><button data-tab="up">회원가입</button></div>
+  <form id="authform">
+    <input class="field" id="nick" placeholder="닉네임" style="display:none" maxlength="12" />
+    <input class="field" id="email" type="email" placeholder="이메일" required autocomplete="email" />
+    <input class="field" id="pw" type="password" placeholder="비밀번호 (6자 이상)" required minlength="6" autocomplete="current-password" />
+    <button class="btn dark" id="authsubmit">로그인</button>
+  </form>
+</div></div>
+
+<div class="modal" id="setmodal"><div class="mbox">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1.4rem">Supabase 연결</h3><button class="x" data-action="close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="hint" style="margin:12px 0 14px">프로젝트 URL과 anon(public) 키를 입력하면 이 브라우저에 저장하고 실제 DB로 동작합니다. 비우면 체험 모드(브라우저 저장)로 돌아갑니다.</p>
+  <form id="setform">
+    <input class="field" id="sburl" placeholder="https://xxxx.supabase.co" />
+    <input class="field" id="sbkey" placeholder="anon public key" />
+    <button class="btn dark">저장하고 새로고침</button>
+  </form>
+</div></div>
+
+<div class="toasts" id="toasts"></div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+
+/* ------------------------------------------------------------------ */
+/* helpers                                                             */
+/* ------------------------------------------------------------------ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const won = (n) => Number(n).toLocaleString('ko-KR') + '원';
+const icon = (n, cls = '') => `<svg class="i ${cls}"><use href="#i-${n}"/></svg>`;
+const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const ago = (iso) => {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 60) return '방금 전'; if (s < 3600) return Math.floor(s / 60) + '분 전';
+  if (s < 86400) return Math.floor(s / 3600) + '시간 전'; return new Date(iso).toLocaleDateString('ko-KR');
+};
+const TINTS = ['#FFD23F', '#FF9B6B', '#A8D5BA', '#9CC9E8', '#F4B6B0', '#F2E3B3'];
+const tint = (id) => TINTS[Number(id) % TINTS.length];
+const category = (e) => ({ '🍊': '과일', '🐖': '육류', '🐟': '수산' }[e] || '간식·가공');
+function toast(msg, err) {
+  const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
+  $('#toasts').append(t); setTimeout(() => t.remove(), 3000);
+}
+
+/* flat sticker-style product illustrations (the DB `emoji` column only picks which one) */
+const INK = '#12201F';
+function art(p) {
+  const s = `stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
+  const n = p.name || ''; let g;
+  switch (p.emoji) {
+    case '🍊': {
+      const c = n.includes('천혜향') ? '#FF6B35' : '#FF9A1F';
+      g = `<circle cx="60" cy="68" r="34" fill="${c}" ${s}/>${n.includes('한라봉') ? `<path d="M50 36c0-8 20-8 20 0" fill="${c}" ${s}/>` : ''}
+        <path d="M60 34c2-12 14-16 26-12-2 12-14 17-26 12z" fill="#43A047" ${s}/><path d="M40 64a22 22 0 0 1 14-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/>`; break;
+    }
+    case '🐖':
+      g = `<rect x="18" y="38" width="84" height="48" rx="18" fill="#F4A6A0" ${s}/><path d="M30 52c10-8 18 8 28 0s18 8 30 0M30 68c10-8 18 8 28 0s18 8 30 0" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`; break;
+    case '🐟': {
+      const silver = n.includes('갈치');
+      g = silver
+        ? `<path d="M10 62c20-18 56-20 80-4l16-12v32l-16-12c-24 16-60 14-80-4z" fill="#D5DEE4" ${s}/><circle cx="24" cy="60" r="3" fill="${INK}"/><path d="M40 52v20M54 50v22M68 52v18" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>`
+        : `<path d="M16 60c14-24 52-26 70-6l20-14v40L86 66C68 86 30 84 16 60z" fill="#F58C8C" ${s}/><circle cx="32" cy="56" r="3.5" fill="${INK}"/><path d="M52 44c6 10 6 24 0 34M66 46c5 8 5 20 0 30" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>`;
+      break;
+    }
+    case '🍫':
+      g = `<rect x="24" y="26" width="72" height="68" rx="10" fill="#7B4A2D" transform="rotate(-8 60 60)" ${s}/><g stroke="#A8744F" stroke-width="3" transform="rotate(-8 60 60)"><path d="M60 26v68M24 60h72"/></g><path d="M22 70l46 24H26a6 6 0 0 1-6-6z" fill="#FF8A1F" ${s}/>`; break;
+    case '🍡':
+      g = `<circle cx="38" cy="76" r="21" fill="#F7ECD6" ${s}/><circle cx="82" cy="76" r="21" fill="#F7ECD6" ${s}/><circle cx="60" cy="48" r="21" fill="#F7ECD6" ${s}/>
+        <g fill="${INK}"><circle cx="32" cy="72" r="1.8"/><circle cx="44" cy="82" r="1.8"/><circle cx="76" cy="72" r="1.8"/><circle cx="88" cy="82" r="1.8"/><circle cx="55" cy="44" r="1.8"/><circle cx="66" cy="54" r="1.8"/></g>`; break;
+    case '🍶':
+      g = `<rect x="44" y="40" width="32" height="56" rx="8" fill="#F7F1E1" ${s}/><rect x="52" y="20" width="16" height="24" fill="#F7F1E1" ${s}/><rect x="49" y="12" width="22" height="10" rx="3" fill="${INK}"/><circle cx="60" cy="68" r="11" fill="#FF5A1F" ${s}/>`; break;
+    case '🍵':
+      g = `<path d="M18 54h84a42 36 0 0 1-84 0z" fill="#8DBF6A" ${s}/><ellipse cx="60" cy="54" rx="42" ry="9" fill="#C9E4A8" ${s}/><path d="M46 38c-6-6 6-10 0-18M62 38c-6-6 6-10 0-18M78 38c-6-6 6-10 0-18" fill="none" ${s}/>`; break;
+    case '🥣':
+      g = `<path d="M16 58h88a44 36 0 0 1-88 0z" fill="#E8663C" ${s}/><ellipse cx="60" cy="58" rx="44" ry="10" fill="#7A4B2A" ${s}/><g fill="#2E6B3A"><ellipse cx="46" cy="58" rx="7" ry="3"/><ellipse cx="68" cy="60" rx="8" ry="3"/><ellipse cx="82" cy="56" rx="5" ry="2.5"/></g><path d="M78 22l18 30M88 20l16 30" ${s}/>`; break;
+    default:
+      g = `<circle cx="60" cy="60" r="34" fill="#fff" ${s}/>`;
+  }
+  return `<svg class="art" viewBox="0 0 120 120" aria-hidden="true">${g}</svg>`;
+}
+
+/* ------------------------------------------------------------------ */
+/* data layer: Supabase if configured, otherwise browser-local demo    */
+/* ------------------------------------------------------------------ */
+const ENV = import.meta.env || {};
+const stored = load('jeju_sb', {});
+const SB_URL = ENV.VITE_SUPABASE_URL || stored.url;
+const SB_KEY = ENV.VITE_SUPABASE_ANON_KEY || stored.key;
+const sb = SB_URL && SB_KEY ? createClient(SB_URL, SB_KEY) : null;
+
+const DEMO_PRODUCTS = [
+  [1, '한라봉 3kg', '달콤새콤 제주 한라봉 선물세트', '🍊', 28700], [2, '천혜향 2kg', '향이 진한 프리미엄 천혜향', '🍊', 34300],
+  [3, '흑돼지 오겹살 600g', '쫄깃고소한 제주 흑돼지 구이용', '🐖', 31900], [4, '옥돔 3마리', '제주 바다에서 잡은 손질 옥돔', '🐟', 45200],
+  [5, '갈치 2마리', '은빛 제주 은갈치 (대)', '🐟', 39800], [6, '제주 감귤 초콜릿', '감귤 풍미 가득한 수제 초콜릿', '🍫', 12600],
+  [7, '오메기떡 10개입', '쫀득한 제주 전통 오메기떡', '🍡', 17400], [8, '우도 땅콩 막걸리', '우도 땅콩으로 빚은 고소한 막걸리', '🍶', 9300],
+  [9, '제주 말차 세트', '제주 오설록 스타일 말차 티백 세트', '🍵', 21500], [10, '성게 미역국 세트', '제주 성게알이 듬뿍 든 간편 미역국', '🥣', 24900],
+].map(([id, name, description, emoji, price]) => ({ id, name, description, emoji, price }));
+
+const demo = {
+  user: { id: 'demo', name: '체험 손님', email: 'demo@local' },
+  async products() { return DEMO_PRODUCTS; },
+  async getUser() { return this.user; },
+  async cart() { return load('d_cart', []); },
+  async setCart(pid, qty) {
+    let c = load('d_cart', []); const i = c.findIndex((x) => x.product_id === pid);
+    if (i >= 0) c[i].quantity = qty; else c.push({ product_id: pid, quantity: qty }); save('d_cart', c);
+  },
+  async removeCart(pid) { save('d_cart', load('d_cart', []).filter((x) => x.product_id !== pid)); },
+  async order(items) {
+    const o = load('d_orders', []);
+    items.forEach((it, k) => o.unshift({ id: Date.now() + k, product_id: it.p.id, product_name: it.p.name, unit_price: it.p.price,
+      quantity: it.quantity, total_price: it.p.price * it.quantity, status: 'ordered', created_at: new Date().toISOString() }));
+    save('d_orders', o); save('d_cart', []);
+  },
+  async orders() { return load('d_orders', []); },
+  async returnOrder(id) { save('d_orders', load('d_orders', []).map((o) => (o.id === id ? { ...o, status: 'returned' } : o))); },
+  async posts() {
+    return load('d_posts', [
+      { id: 1, user_id: 'x', author: '제주토박이', content: '한라봉 박스 열자마자 향이 확 퍼졌어요. 재구매 확정!', created_at: new Date(Date.now() - 3600e3 * 5).toISOString(), comments: [{ id: 1, user_id: 'y', author: '귤덕후', content: '저도 시켜봐야겠어요' }], likes: ['y'] },
+      { id: 2, user_id: 'y', author: '귤덕후', content: '옥돔 손질이 깔끔해서 바로 구워 먹었어요.', created_at: new Date(Date.now() - 3600e3 * 30).toISOString(), comments: [], likes: [] },
+      { id: 3, user_id: 'z', author: '바다집사', content: '오메기떡 쫀득함이 진짜예요. 선물용으로도 좋아요.', created_at: new Date(Date.now() - 3600e3 * 52).toISOString(), comments: [], likes: [] },
+    ]);
+  },
+  async addPost(content) { const p = load('d_posts', await this.posts()); p.unshift({ id: Date.now(), user_id: 'demo', author: this.user.name, content, created_at: new Date().toISOString(), comments: [], likes: [] }); save('d_posts', p); },
+  async delPost(id) { save('d_posts', (await this.posts()).filter((p) => p.id !== id)); },
+  async addComment(pid, content) { const p = await this.posts(); p.find((x) => x.id === pid)?.comments.push({ id: Date.now(), user_id: 'demo', author: this.user.name, content }); save('d_posts', p); },
+  async delComment(pid, cid) { const p = await this.posts(); const t = p.find((x) => x.id === pid); if (t) t.comments = t.comments.filter((c) => c.id !== cid); save('d_posts', p); },
+  async toggleLike(pid) { const p = await this.posts(); const t = p.find((x) => x.id === pid); if (!t) return; t.likes = t.likes.includes('demo') ? t.likes.filter((u) => u !== 'demo') : [...t.likes, 'demo']; save('d_posts', p); },
+};
+
+const remote = {
+  async products() { const { data, error } = await sb.from('products').select('*').order('id'); if (error) throw error; return data; },
+  async getUser() {
+    const { data } = await sb.auth.getUser(); const u = data?.user; if (!u) return null;
+    return { id: u.id, email: u.email, name: u.user_metadata?.name || u.email.split('@')[0] };
+  },
+  async cart() { const { data, error } = await sb.from('cart_items').select('id,product_id,quantity').order('id'); if (error) throw error; return data; },
+  async setCart(pid, qty) { const { error } = await sb.from('cart_items').upsert({ product_id: pid, quantity: qty }, { onConflict: 'user_id,product_id' }); if (error) throw error; },
+  async removeCart(pid) { const { error } = await sb.from('cart_items').delete().eq('product_id', pid); if (error) throw error; },
+  async order(items) {
+    const rows = items.map((it) => ({ product_id: it.p.id, product_name: it.p.name, unit_price: it.p.price, quantity: it.quantity }));
+    const { error } = await sb.from('orders').insert(rows); if (error) throw error;
+    const { error: e2 } = await sb.from('cart_items').delete().in('product_id', items.map((i) => i.p.id)); if (e2) throw e2;
+  },
+  async orders() { const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false }); if (error) throw error; return data; },
+  async returnOrder(id) { const { error } = await sb.from('orders').update({ status: 'returned' }).eq('id', id); if (error) throw error; },
+  async posts() {
+    const { data, error } = await sb.from('guestbook_posts').select('*, guestbook_comments(*), guestbook_likes(user_id)').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data.map((p) => ({ ...p, comments: (p.guestbook_comments || []).sort((a, b) => a.id - b.id), likes: (p.guestbook_likes || []).map((l) => l.user_id) }));
+  },
+  async addPost(content) { const { error } = await sb.from('guestbook_posts').insert({ author: S.user.name, content }); if (error) throw error; },
+  async delPost(id) { const { error } = await sb.from('guestbook_posts').delete().eq('id', id); if (error) throw error; },
+  async addComment(pid, content) { const { error } = await sb.from('guestbook_comments').insert({ post_id: pid, author: S.user.name, content }); if (error) throw error; },
+  async delComment(_p, cid) { const { error } = await sb.from('guestbook_comments').delete().eq('id', cid); if (error) throw error; },
+  async toggleLike(pid) {
+    const liked = S.posts.find((p) => p.id === pid)?.likes.includes(S.user.id);
+    const q = liked ? sb.from('guestbook_likes').delete().match({ post_id: pid, user_id: S.user.id }) : sb.from('guestbook_likes').insert({ post_id: pid });
+    const { error } = await q; if (error) throw error;
+  },
+};
+const api = sb ? remote : demo;
+
+/* ------------------------------------------------------------------ */
+/* state + rendering                                                   */
+/* ------------------------------------------------------------------ */
+const S = { loadError: false, products: [], cart: [], orders: [], posts: [], user: null, cat: '전체', q: '', sort: 'id', openComments: new Set(), loadingProducts: true };
+const prod = (id) => S.products.find((p) => p.id === id);
+const cartLines = () => S.cart.map((c) => ({ ...c, p: prod(c.product_id) })).filter((c) => c.p);
+const need = async (fn) => { try { return await fn(); } catch (e) { console.error(e); toast(e.message || '요청에 실패했어요', true); } };
+
+function renderChrome() {
+  $('#mode').textContent = sb ? 'Live' : 'Demo';
+  $('#storage').textContent = sb ? 'Supabase' : '이 브라우저(체험)';
+  $('#authbtn').innerHTML = !sb ? `${icon('user')}<span class="lb">체험 모드</span>` : S.user ? `${icon('user')}<span class="lb">${esc(S.user.name)} · 로그아웃</span>` : `${icon('user')}<span class="lb">로그인</span>`;
+  $('#authbtn').dataset.action = !sb ? 'settings' : 'auth';
+  $('#gbwho').textContent = S.user ? `${S.user.name} 님으로 작성` : '로그인 후 작성할 수 있어요';
+  $('#count').textContent = cartLines().reduce((a, c) => a + c.quantity, 0);
+}
+
+function renderShop() {
+  const cats = ['전체', ...new Set(S.products.map((p) => category(p.emoji)))];
+  $('#chips').innerHTML = cats.map((c) => `<button class="chip ${c === S.cat ? 'on' : ''}" data-cat="${c}">${c}</button>`).join('');
+  let list = S.products.filter((p) => (S.cat === '전체' || category(p.emoji) === S.cat) && (p.name + (p.description || '')).includes(S.q));
+  if (S.sort === 'asc') list = [...list].sort((a, b) => a.price - b.price);
+  if (S.sort === 'desc') list = [...list].sort((a, b) => b.price - a.price);
+  const g = $('#grid');
+  if (S.loadingProducts) { g.innerHTML = '<div class="skeleton"></div>'.repeat(6); return; }
+  if (S.loadError) { g.innerHTML = '<div class="empty">상품을 불러오지 못했어요.<br>Supabase 연결 설정(URL·키)과 네트워크를 확인해주세요.</div>'; return; }
+  if (!S.products.length) { g.innerHTML = '<div class="empty">상품이 없어요. Supabase SQL Editor에서 supabase/schema.sql을 실행했는지 확인해주세요.</div>'; return; }
+  if (!list.length) { g.innerHTML = '<div class="empty">찾는 상품이 없어요. 바람이 가져갔나 봐요.</div>'; return; }
+  g.innerHTML = list.map((p) => `
+    <article class="card">
+      <div class="thumb" style="background:${tint(p.id)}"><span class="no">No.${String(p.id).padStart(2, '0')}</span><span class="tag">${category(p.emoji)}</span>${art(p)}</div>
+      <div class="cbody"><h3>${esc(p.name)}</h3><p class="desc">${esc(p.description)}</p>
+        <div class="cfoot"><span class="price">${Number(p.price).toLocaleString('ko-KR')}<small>원</small></span>
+          <button class="add" data-action="add" data-id="${p.id}" aria-label="${esc(p.name)} 담기">${icon('plus')}</button></div></div>
+    </article>`).join('');
+}
+
+function renderCart() {
+  const lines = cartLines();
+  $('#cartbody').innerHTML = lines.length ? lines.map(({ p, quantity }) => `
+    <div class="line"><div class="em" style="background:${tint(p.id)}">${art(p)}</div>
+      <div><b>${esc(p.name)}</b><br><small>${won(p.price)}</small>
+        <div class="qty"><button data-action="dec" data-id="${p.id}" aria-label="감소">${icon('minus')}</button><b>${quantity}</b><button data-action="inc" data-id="${p.id}" aria-label="증가">${icon('plus')}</button></div></div>
+      <div style="text-align:right"><b>${won(p.price * quantity)}</b><br><button class="rm" data-action="rm" data-id="${p.id}">삭제</button></div></div>`).join('')
+    : '<div class="empty">장바구니가 텅 비었어요.<br>귤 한 알 없는 장바구니는 쓸쓸합니다.</div>';
+  $('#carttotal').textContent = won(lines.reduce((a, l) => a + l.p.price * l.quantity, 0));
+  $('#checkout').disabled = !lines.length;
+}
+
+function renderOrders() {
+  $('#ordersbody').innerHTML = S.orders.length ? S.orders.map((o) => `
+    <div class="line" style="grid-template-columns:1fr auto"><div><b>${esc(o.product_name)}</b> × ${o.quantity}<br>
+      <small>${won(o.total_price)} · ${ago(o.created_at)}</small></div>
+      <div style="text-align:right"><span class="status ${o.status}">${o.status === 'ordered' ? '주문완료' : '반품됨'}</span>
+      ${o.status === 'ordered' ? `<br><button class="rm" data-action="return" data-id="${o.id}">반품 신청</button>` : ''}</div></div>`).join('')
+    : '<div class="empty">아직 주문이 없어요. 첫 주문의 주인공이 되어보세요.</div>';
+}
+
+function renderPosts() {
+  const uid = S.user?.id;
+  $('#posts').innerHTML = S.posts.length ? S.posts.map((p) => {
+    const open = S.openComments.has(p.id), liked = uid && p.likes.includes(uid);
+    return `<article class="post"><div class="meta"><span class="who"><span class="avatar">${esc(p.author[0] || '?')}</span>${esc(p.author)}</span>
+        <span>${ago(p.created_at)}</span></div>
+      <p>${esc(p.content)}</p>
+      <div class="acts"><button class="pill ${liked ? 'liked' : ''}" data-action="like" data-id="${p.id}">${icon('heart')} ${p.likes.length}</button>
+        <button class="pill" data-action="toggle-c" data-id="${p.id}">${icon('chat')} ${p.comments.length}</button>
+        ${uid && p.user_id === uid ? `<button class="pill" data-action="del-post" data-id="${p.id}" aria-label="글 삭제">${icon('trash')}</button>` : ''}</div>
+      ${open ? `<div class="comments">${p.comments.map((c) => `<div class="comment"><span><b>${esc(c.author)}</b>${esc(c.content)}</span>
+        ${uid && c.user_id === uid ? `<button class="rm" data-action="del-c" data-id="${p.id}" data-cid="${c.id}">삭제</button>` : ''}</div>`).join('')}
+        <form class="cform" data-id="${p.id}"><input class="field" placeholder="댓글 달기" maxlength="200" required /><button class="pill">등록</button></form></div>` : ''}</article>`;
+  }).join('') : '<div class="empty">첫 방명록의 주인공이 되어주세요.</div>';
+}
+
+/* hero marketing blocks: every number comes from the loaded product data */
+function renderHero() {
+  const P = S.products; if (!P.length) return;
+  const cats = [...new Set(P.map((p) => category(p.emoji)))];
+  const min = Math.min(...P.map((p) => p.price));
+  $('#quick').innerHTML = `<span>바로가기</span>` + cats.map((c) => `<a class="qchip" href="#shop" data-cat="${c}">${c}</a>`).join('');
+  $('#stats').innerHTML = `<div><b>${P.length}<small>종</small></b><span>제주 특산품</span></div>
+    <div><b>${min.toLocaleString('ko-KR')}<small>원~</small></b><span>시작 가격</span></div>
+    <div><b>${cats.length}<small>개</small></b><span>카테고리</span></div>`;
+  const day = Math.floor(Date.now() / 864e5), p = P[day % P.length];
+  const sp = $('#spot'); sp.hidden = false;
+  sp.innerHTML = `<span class="spot-tag">오늘의 PICK</span>
+    <div class="spot-art" style="background:${tint(p.id)}">${art(p)}</div>
+    <div><b class="n">${esc(p.name)}</b><small>${esc(p.description)}</small>
+      <div class="row"><b>${won(p.price)}</b><button class="add" data-action="add" data-id="${p.id}" aria-label="${esc(p.name)} 담기">${icon('plus')}</button></div></div>`;
+}
+
+const renderAll = () => { renderChrome(); renderShop(); renderCart(); renderOrders(); renderPosts(); };
+
+/* 제주어: only expressions whose meaning was checked against public sources; jokes are in standard Korean */
+const WORDS = [
+  { w: '혼저 옵서예', m: '어서 오세요', j: '가게 문을 열자마자 이 인사부터 받으면, 지갑도 같이 마중 나옵니다.' },
+  { w: '폭삭 속았수다', m: '수고하셨습니다', j: '주문 버튼 누르느라 고생한 손가락에게 해주세요.' },
+  { w: '몬딱', m: '모조리, 다', j: '몬딱 담고 싶은 마음은 이해합니다. 한도는 지갑이 정해요.' },
+  { w: '괸당', m: '친척', j: '선물 보낼 괸당 명단이 상자 수보다 길다면, 이미 늦었습니다.' },
+  { w: '어멍', m: '어머니', j: '한라봉 한 상자를 보내면 안부 전화가 먼저 옵니다.' },
+  { w: '아방', m: '아버지', j: '"이거 얼마 줬니?"까지가 선물의 완성입니다.' },
+];
+$('#words').innerHTML = WORDS.map((x) => `<article class="word"><div class="w">${x.w}</div><span class="m">${x.m}</span><p class="j">${x.j}</p></article>`).join('');
+const ADD_LINES = [
+  '장바구니에 쏙! 이제 마음의 준비만 하세요.',
+  '좋은 선택이에요. 지갑도 같은 생각이면 좋겠네요.',
+  '하나 더 담으면 행복도 하나 더.',
+  '담았다! 귤은 거짓말을 하지 않습니다.',
+  '장바구니 입장 완료. 퇴장은 결제로만 가능합니다.',
+];
+let addN = 0;
+
+/* marquee */
+{
+  const words = ['혼저 옵서예', '한라봉', '천혜향', '흑돼지', '옥돔', '갈치', '오메기떡', '폭삭 속았수다', '감귤 초콜릿', '말차', '성게 미역국'];
+  const one = words.map((w) => `<span>${w}${icon('star', 'fill')}</span>`).join('');
+  $('#track').innerHTML = one + one + one + one;
+}
+
+/* ------------------------------------------------------------------ */
+/* data refresh                                                        */
+/* ------------------------------------------------------------------ */
+async function refreshUserData() {
+  S.user = await need(() => api.getUser());
+  S.cart = S.user ? (await need(() => api.cart())) || [] : [];
+  S.orders = S.user ? (await need(() => api.orders())) || [] : [];
+  renderChrome(); renderCart(); renderOrders(); renderPosts();
+}
+async function refreshPosts() { S.posts = (await need(() => api.posts())) || S.posts; renderPosts(); }
+async function init() {
+  renderAll();
+  const prods = await need(() => api.products());
+  S.loadError = !prods; S.products = prods || [];
+  S.loadingProducts = false;
+  renderShop(); renderHero();
+  await refreshUserData();
+  await refreshPosts();
+  if (sb) sb.auth.onAuthStateChange(async () => { await refreshUserData(); await refreshPosts(); });
+}
+
+/* ------------------------------------------------------------------ */
+/* UI: drawers, modals, auth                                           */
+/* ------------------------------------------------------------------ */
+const scrim = $('#scrim');
+function closeAll() { document.querySelectorAll('.drawer,.modal').forEach((e) => e.classList.remove('show')); scrim.classList.remove('show'); }
+function openEl(sel) { closeAll(); $(sel).classList.add('show'); scrim.classList.add('show'); }
+let authMode = 'in';
+function setAuthMode(m) {
+  authMode = m;
+  document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === m));
+  $('#nick').style.display = m === 'up' ? '' : 'none'; $('#nick').required = m === 'up';
+  $('#authsubmit').textContent = m === 'up' ? '가입하기' : '로그인';
+  $('#pw').autocomplete = m === 'up' ? 'new-password' : 'current-password';
+}
+const requireUser = () => { if (S.user) return true; toast('로그인이 필요해요'); setAuthMode('in'); openEl('#authmodal'); return false; };
+
+document.addEventListener('click', async (e) => {
+  const tab = e.target.closest('[data-tab]'); if (tab) return setAuthMode(tab.dataset.tab);
+  const cat = e.target.closest('[data-cat]'); if (cat) { S.cat = cat.dataset.cat; return renderShop(); }
+  const el = e.target.closest('[data-action]'); if (!el) return;
+  const a = el.dataset.action, id = Number(el.dataset.id);
+  switch (a) {
+    case 'close': closeAll(); break;
+    case 'open-cart': openEl('#cartdrawer'); break;
+    case 'open-orders': if (requireUser()) { await refreshUserData(); openEl('#ordersdrawer'); } break;
+    case 'settings': $('#sburl').value = stored.url || ''; $('#sbkey').value = stored.key || ''; openEl('#setmodal'); break;
+    case 'auth':
+      if (S.user) { await sb.auth.signOut(); toast('로그아웃했어요'); } else { setAuthMode('in'); openEl('#authmodal'); }
+      break;
+    case 'add': {
+      if (!requireUser()) break;
+      const cur = S.cart.find((c) => c.product_id === id);
+      await need(async () => { await api.setCart(id, (cur?.quantity || 0) + 1); S.cart = await api.cart(); });
+      flyToCart(el, prod(id)); renderCart(); renderChrome(); toast(ADD_LINES[addN++ % ADD_LINES.length]);
+      $('#count').classList.remove('bump'); void $('#count').offsetWidth; $('#count').classList.add('bump');
+      break;
+    }
+    case 'inc': case 'dec': {
+      const cur = S.cart.find((c) => c.product_id === id); if (!cur) break;
+      const q = cur.quantity + (a === 'inc' ? 1 : -1);
+      await need(async () => { q < 1 ? await api.removeCart(id) : await api.setCart(id, q); S.cart = await api.cart(); });
+      renderCart(); renderChrome(); break;
+    }
+    case 'rm': await need(async () => { await api.removeCart(id); S.cart = await api.cart(); }); renderCart(); renderChrome(); break;
+    case 'checkout': {
+      const items = cartLines(); if (!items.length) break;
+      el.disabled = true;
+      await need(async () => { await api.order(items); toast('주문 완료! 폭삭 속았수다 (수고하셨습니다)'); });
+      await refreshUserData(); closeAll(); openEl('#ordersdrawer'); break;
+    }
+    case 'return':
+      if (confirm('이 주문을 반품 처리할까요?')) { await need(async () => { await api.returnOrder(id); toast('반품 처리되었어요'); }); await refreshUserData(); }
+      break;
+    case 'like': if (requireUser()) { await need(() => api.toggleLike(id)); await refreshPosts(); } break;
+    case 'toggle-c': S.openComments.has(id) ? S.openComments.delete(id) : S.openComments.add(id); renderPosts(); break;
+    case 'del-post': if (confirm('글을 삭제할까요?')) { await need(() => api.delPost(id)); await refreshPosts(); } break;
+    case 'del-c': await need(() => api.delComment(id, Number(el.dataset.cid))); await refreshPosts(); break;
+  }
+});
+
+$('#authform').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = $('#email').value.trim(), password = $('#pw').value;
+  await need(async () => {
+    if (authMode === 'up') {
+      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { name: $('#nick').value.trim() } } });
+      if (error) throw error;
+      if (!data.session) { toast('가입 완료! 이메일 인증 후 로그인해주세요'); closeAll(); return; }
+      toast('환영합니다');
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error; toast('로그인되었어요');
+    }
+    closeAll(); e.target.reset();
+  });
+});
+$('#setform').addEventListener('submit', (e) => {
+  e.preventDefault(); save('jeju_sb', { url: $('#sburl').value.trim(), key: $('#sbkey').value.trim() }); location.reload();
+});
+$('#gbform').addEventListener('submit', async (e) => {
+  e.preventDefault(); if (!requireUser()) return;
+  const t = $('#gbtext').value.trim(); if (!t) return;
+  await need(async () => { await api.addPost(t); $('#gbtext').value = ''; toast('방명록을 남겼어요'); }); await refreshPosts();
+});
+$('#posts').addEventListener('submit', async (e) => {
+  const f = e.target.closest('.cform'); if (!f) return; e.preventDefault();
+  if (!requireUser()) return; const input = f.querySelector('input'); const pid = Number(f.dataset.id);
+  await need(() => api.addComment(pid, input.value.trim())); await refreshPosts();
+});
+$('#q').addEventListener('input', (e) => { S.q = e.target.value.trim(); renderShop(); });
+$('#sort').addEventListener('change', (e) => { S.sort = e.target.value; renderShop(); });
+addEventListener('keydown', (e) => e.key === 'Escape' && closeAll());
+
+/* fly-to-cart */
+function flyToCart(from, p) {
+  const a = from.getBoundingClientRect(), b = $('.cartbtn').getBoundingClientRect();
+  const f = document.createElement('div'); f.className = 'fly'; f.innerHTML = p ? art(p) : '';
+  f.style.left = a.left + 'px'; f.style.top = a.top + 'px'; document.body.append(f);
+  f.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+    { transform: `translate(${(b.left - a.left) / 2}px, ${(b.top - a.top) / 2 - 90}px) scale(1.15)`, opacity: 1, offset: .5 },
+    { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(.3)`, opacity: .2 }],
+    { duration: 750, easing: 'cubic-bezier(.4,.1,.3,1)' }).onfinish = () => f.remove();
+}
+
+/* header + reveal on scroll */
+const hdr = $('#hdr');
+const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && x.target.classList.add('in')), { threshold: .05 });
+document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+/* ------------------------------------------------------------------ */
+/* three.js scene: studio-lit hallabong on a sun disc + 3D title       */
+/* ------------------------------------------------------------------ */
+function initScene() {
+  const canvas = $('#bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, .1, 100); camera.position.set(0, .4, 8);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x0b3b3c, 1.25));
+  const key = new THREE.DirectionalLight(0xfff0d6, 2.8); key.position.set(-4, 5, 6); scene.add(key);
+  const fill = new THREE.DirectionalLight(0x9fe0d0, 1.1); fill.position.set(5, -1, 3); scene.add(fill);
+
+  /* sun disc + thin orbit ring behind the fruit */
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(2.7, 96), new THREE.MeshBasicMaterial({ color: 0xffc21a })); scene.add(disc);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(3.7, .012, 8, 160), new THREE.MeshBasicMaterial({ color: 0xfff3de })); scene.add(ring);
+
+  /* hallabong */
+  const tc = document.createElement('canvas'); tc.width = tc.height = 512;
+  const ctx = tc.getContext('2d'); ctx.fillStyle = '#9a9a9a'; ctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 7000; i++) { const g = 90 + Math.random() * 60; ctx.fillStyle = `rgb(${g},${g},${g})`; ctx.beginPath(); ctx.arc(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 2.2, 0, 7); ctx.fill(); }
+  const bump = new THREE.CanvasTexture(tc); bump.wrapS = bump.wrapT = THREE.RepeatWrapping; bump.repeat.set(2, 1);
+  const hero = new THREE.Group();
+  const peel = (c, s) => new THREE.MeshStandardMaterial({ color: c, roughness: .55, bumpMap: bump, bumpScale: s });
+  const fruit = new THREE.Mesh(new THREE.SphereGeometry(1.25, 96, 96), peel(0xff6a1a, 1.6)); fruit.scale.set(1, .93, 1); hero.add(fruit);
+  const nub = new THREE.Mesh(new THREE.SphereGeometry(.4, 40, 40), peel(0xff6a1a, 1.2)); nub.scale.set(1, .85, 1); nub.position.y = 1.2; hero.add(nub);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(.04, .07, .22, 12), new THREE.MeshStandardMaterial({ color: 0x3b2a14, roughness: .8 })); stem.position.y = 1.55; hero.add(stem);
+  const leafMat = new THREE.MeshStandardMaterial({ color: 0x2f9e44, roughness: .55, side: THREE.DoubleSide });
+  const leaf = new THREE.Mesh(new THREE.SphereGeometry(.55, 32, 12), leafMat); leaf.scale.set(1, .06, .42); leaf.position.set(.5, 1.52, 0); leaf.rotation.z = .35; hero.add(leaf);
+  const leaf2 = leaf.clone(); leaf2.position.set(-.45, 1.5, .1); leaf2.rotation.set(0, 2.4, -.4); hero.add(leaf2);
+  scene.add(hero);
+
+  /* orbiting small citrus */
+  const small = [], sg = new THREE.SphereGeometry(1, 32, 32);
+  const cols = [0xff6a1a, 0xffc21a, 0xfff3de, 0xff9a1f];
+  for (let i = 0; i < 9; i++) {
+    const m = new THREE.Mesh(sg, peel(cols[i % 4], .7));
+    m.scale.setScalar(.14 + Math.random() * .2); scene.add(m);
+    small.push({ m, r: 2.9 + Math.random() * 1.8, a: Math.random() * 6.28, sp: .08 + Math.random() * .2, y: (Math.random() - .5) * 3, ph: Math.random() * 6 });
+  }
+
+  /* 3D title: Hangul has no typeface JSON for TextGeometry, so extrude the
+     canvas-rendered Gmarket Sans glyphs as stacked layers (side walls) + a flat front face */
+  const title = new THREE.Group(); title.visible = false; scene.add(title);
+  const spacer = $('#title3d');
+  let titleReady = false;
+  document.fonts.load('700 200px "Gmarket Sans"').then(() => {
+    const W = 2048, H = 640, TXT = '제주상점', LAYERS = 30, DEPTH = .08;
+    const draw = (paint) => {
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const x = c.getContext('2d'); x.font = '700 430px "Gmarket Sans"'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.lineJoin = 'round'; paint(x);
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+    };
+    const cy = H / 2 + 12;
+    const sideTex = draw((x) => { x.lineWidth = 26; x.strokeStyle = '#fff'; x.strokeText(TXT, W / 2, cy); x.fillStyle = '#fff'; x.fillText(TXT, W / 2, cy); });
+    const frontTex = draw((x) => {
+      const g = x.createLinearGradient(0, 70, 0, H - 70); g.addColorStop(0, '#fffaf0'); g.addColorStop(1, '#ffe3b8');
+      x.lineWidth = 26; x.strokeStyle = '#fff3de'; x.strokeText(TXT, W / 2, cy); x.fillStyle = g; x.fillText(TXT, W / 2, cy);
+    });
+    const geo = new THREE.PlaneGeometry(1, H / W);
+    const back = new THREE.Color(0x8a2a05), near = new THREE.Color(0xff5a1f);
+    for (let i = 0; i < LAYERS; i++) {
+      const f = i / (LAYERS - 1);
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: sideTex, color: back.clone().lerp(near, f), alphaTest: .5 }));
+      m.position.z = -DEPTH * (1 - f); title.add(m);
+    }
+    const face = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: frontTex, transparent: true, alphaTest: .02 }));
+    face.position.z = .002; title.add(face);
+    spacer.classList.add('gl'); titleReady = true;
+  });
+  const ray = new THREE.Vector3();
+
+  let mx = 0, my = 0, tx = 0, ty = 0, narrow = false;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize() {
+    const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix(); narrow = w < 820;
+  }
+  addEventListener('resize', resize); resize();
+  addEventListener('pointermove', (e) => { tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; });
+
+  const clock = new THREE.Clock();
+  (function loop() {
+    const t = clock.getElapsedTime(), k = Math.min(scrollY / innerHeight, 1.6);
+    mx += (tx - mx) * .05; my += (ty - my) * .05;
+    const baseX = narrow ? 0 : 2.5, baseY = narrow ? 2.1 : .3, sc = narrow ? .45 : 1;
+    const s = sc * (1 - Math.min(k, 1) * .25);
+    hero.scale.setScalar(s);
+    hero.position.set(baseX - k * 1.2, baseY + Math.sin(t * 1.1) * .1 + k * 1.4, -k * 2);
+    hero.rotation.y = t * .25 + mx * 1.2; hero.rotation.x = my * .4; hero.rotation.z = Math.sin(t * .5) * .06;
+    disc.position.set(hero.position.x, hero.position.y - .1, hero.position.z - 1.6); disc.scale.setScalar(s * 1.12);
+    ring.position.copy(disc.position); ring.scale.setScalar(s); ring.rotation.set(1.2 + my * .3, 0, t * .1 + mx * .3);
+    small.forEach((o, i) => {
+      const a = o.a + t * o.sp;
+      const ox = Math.cos(a) * o.r * (narrow ? .6 : 1);
+      o.m.position.set(hero.position.x + (narrow ? ox : Math.max(ox, -2.2)), hero.position.y + o.y + Math.sin(t + o.ph) * .22, Math.sin(a) * o.r * .8 - 1);
+      o.m.rotation.y = t * .5 + i;
+    });
+    camera.position.x = mx * .6; camera.position.y = .4 - my * .4 - k * .5; camera.lookAt(0, k * .4, 0);
+    if (titleReady) {
+      const r = spacer.getBoundingClientRect();
+      title.visible = r.bottom > 0 && r.top < innerHeight;
+      if (title.visible) {
+        camera.updateMatrixWorld();
+        ray.set(((r.left + r.width / 2) / innerWidth) * 2 - 1, -(((r.top + r.height / 2) / innerHeight) * 2 - 1), .5).unproject(camera).sub(camera.position).normalize();
+        const d = -camera.position.z / ray.z;
+        title.position.copy(camera.position).addScaledVector(ray, d);
+        const worldW = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * d * camera.aspect;
+        title.scale.setScalar((r.width / innerWidth) * worldW);
+        title.rotation.y = calm ? 0 : Math.sin(t * .7) * .22 + mx * .5 - .12;
+        title.rotation.x = calm ? 0 : -.08 + my * .35 + Math.sin(t * .9) * .03;
+        title.position.y += calm ? 0 : Math.sin(t * 1.3) * .05;
+      }
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  })();
+}
+try { initScene(); } catch (err) { console.warn('WebGL을 사용할 수 없어 3D 배경을 건너뜁니다.', err); }
+
+addEventListener('scroll', () => hdr.classList.toggle('solid', scrollY > innerHeight * .6), { passive: true });
+init();
+</script>
+</body>
 </html>
