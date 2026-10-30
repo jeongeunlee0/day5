@@ -224,38 +224,41 @@
   .big { font-size: clamp(3.4rem, 17vw, 13rem); font-weight: 700; letter-spacing: -.05em; line-height: 1; color: var(--tang); }
   .fmeta { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 26px; padding-top: 18px; border-top: 1.5px solid rgba(255,243,222,.25); font-size: .92rem; opacity: .95; }
   footer button { text-decoration: underline; text-underline-offset: 3px; }
-  /* 작동 원리 패널 */
-  .insbtn { position: fixed; left: 16px; bottom: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--cream); border: 1.5px solid var(--cream); font-weight: 700; font-size: .88rem; box-shadow: 0 8px 0 -4px rgba(0,0,0,.25); transition: background .2s; }
-  .insbtn:hover, .insbtn[aria-expanded="true"] { background: var(--tang); color: #fff; }
-  .inspector { position: fixed; left: 16px; bottom: 68px; z-index: 30; width: min(480px, calc(100vw - 32px)); max-height: min(78vh, 640px); overflow: auto; background: var(--paper); border: var(--bd); border-radius: 22px; padding: 16px 18px 18px; box-shadow: 8px 8px 0 var(--ink);
+  /* 문의 응대 채팅 */
+  .chatbtn { position: fixed; right: 16px; bottom: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px 0 16px; border-radius: 999px; background: var(--tang); color: #fff; border: 1.5px solid var(--ink); font-weight: 700; box-shadow: 4px 4px 0 var(--ink); transition: transform .2s, box-shadow .2s, background .2s; }
+  .chatbtn .i { width: 1.5em; height: 1.5em; }
+  .chatbtn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+  .chatbtn.on { background: var(--ink); }
+  .chatdot { position: absolute; top: -6px; right: -4px; min-width: 22px; height: 22px; border-radius: 999px; background: var(--sun); color: var(--ink); border: 1.5px solid var(--ink); font-style: normal; font-size: .75rem; display: grid; place-items: center; }
+  .chatdot[hidden] { display: none; }
+  .chat { position: fixed; right: 16px; bottom: 84px; z-index: 30; width: min(380px, calc(100vw - 32px)); height: min(560px, 74vh); display: flex; flex-direction: column; background: var(--paper); border: var(--bd); border-radius: 22px; overflow: hidden; box-shadow: 8px 8px 0 var(--ink);
     opacity: 0; transform: translateY(16px) scale(.98); pointer-events: none; transition: opacity .3s, transform .3s; }
-  .inspector.show { opacity: 1; transform: none; pointer-events: auto; }
-  .ihead { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .ihead b { font-size: 1.1rem; } .ihead small { color: var(--muted); flex: 1; }
-  .flow { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-top: 14px; }
-  .flow .dot { position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--tang); border: 1.5px solid var(--ink); transition: transform .55s cubic-bezier(.4,.1,.3,1); z-index: 2; }
-  .flow .node { border: var(--bd); border-radius: 12px; padding: 8px 6px; text-align: center; background: #fff; transition: background .3s, transform .3s; min-width: 0; }
-  .flow .node.on { background: var(--sun); transform: translateY(-3px); }
-  .flow .node.done { background: var(--mint); }
-  .flow .n { display: block; font-weight: 700; font-size: .84rem; }
-  .flow .q { display: block; font-size: .7rem; color: var(--muted); }
-  .flow .code { display: block; margin-top: 5px; font-family: ui-monospace, Consolas, monospace; font-size: .68rem; line-height: 1.35; word-break: break-all; white-space: pre-wrap; min-height: 3.8em; text-align: left; }
-  .explain { margin: 12px 0; padding: 10px 12px; border: var(--bd); border-radius: 14px; background: #fff; min-height: 5.4em; font-size: .9rem; }
-  .explain .step { display: inline-block; background: var(--ink); color: var(--cream); border-radius: 999px; padding: 0 10px; margin-right: 6px; font-size: .78rem; }
-  .explain p { margin: 6px 0 0; line-height: 1.55; }
-  .ins-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .ins-grid h4 { font-size: .82rem; margin-bottom: 6px; }
-  .ins-grid pre { background: var(--ink); color: #b9f6ca; border-radius: 10px; padding: 8px 10px; font-size: .78rem; white-space: pre-wrap; word-break: break-all; min-height: 2.6em; }
-  .ins-grid small { display: block; color: var(--muted); font-size: .72rem; margin-top: 4px; }
-  #ins-log { list-style: none; padding: 0; display: grid; gap: 4px; }
-  #ins-log li { display: flex; flex-direction: column; font-size: .78rem; line-height: 1.35; border-bottom: 1px dashed rgba(18,32,31,.25); padding-bottom: 3px; }
-  #ins-log span, #ins-log .muted { color: var(--muted); }
-  .inspector .btn.sm { margin-top: 14px; padding: 10px 18px; font-size: .88rem; }
+  .chat.show { opacity: 1; transform: none; pointer-events: auto; }
+  .chead { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--teal); color: var(--cream); }
+  .chead .ava { width: 40px; height: 40px; border-radius: 50%; background: var(--sun); color: var(--ink); display: grid; place-items: center; flex: none; }
+  .chead b { display: block; line-height: 1.3; } .chead small { display: block; font-size: .78rem; opacity: .9; }
+  .chead > div { flex: 1; min-width: 0; }
+  .chead .x { border-color: var(--cream); color: var(--cream); width: 34px; height: 34px; }
+  .chead .x:hover { background: var(--cream); color: var(--ink); }
+  .clog { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .cmsg { max-width: 88%; padding: 10px 13px; border-radius: 16px; line-height: 1.6; font-size: .94rem; overflow-wrap: anywhere; }
+  .cmsg.bot { align-self: flex-start; background: #fff; border: var(--bd); border-bottom-left-radius: 4px; }
+  .cmsg.me { align-self: flex-end; background: var(--tang); color: #fff; border-bottom-right-radius: 4px; }
+  .cchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .cchips button { border: 1.5px solid var(--tang); color: #b8400f; background: #fff; border-radius: 999px; padding: 6px 12px; font-size: .84rem; font-weight: 700; transition: background .2s, color .2s; }
+  .cchips button:hover { background: var(--tang); color: #fff; }
+  .cacts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .cact { border: var(--bd); background: var(--sun); color: var(--ink); border-radius: 999px; padding: 6px 13px; font-size: .84rem; font-weight: 700; text-decoration: none; transition: background .2s, color .2s; }
+  .cact:hover { background: var(--ink); color: #fff; }
+  .dots span { display: inline-block; width: 8px; height: 8px; margin: 0 2px; border-radius: 50%; background: #9aa6a4; animation: dotb 1s infinite; }
+  .dots span:nth-child(2) { animation-delay: .15s; } .dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes dotb { 0%, 80%, 100% { opacity: .3; } 40% { opacity: 1; } }
+  .chatform { display: flex; gap: 8px; padding: 10px 12px 12px; border-top: var(--bd); background: var(--cream); }
+  .chatform .field { flex: 1; min-width: 0; }
+  .chatform .btn { padding: 0 18px; }
   @media (max-width: 720px) {
-    .insbtn span { display: none; } .insbtn { padding: 12px; }
-    .inspector { left: 8px; bottom: 66px; width: calc(100vw - 16px); max-height: 62vh; }
-    .ins-grid { grid-template-columns: 1fr; }
-    .flow .code { font-size: .62rem; }
+    .chatbtn span.t { display: none; } .chatbtn { padding: 0; width: 56px; justify-content: center; }
+    .chat { right: 8px; bottom: 80px; width: calc(100vw - 16px); height: min(70vh, 560px); }
   }
   .reveal > * { opacity: 0; transform: translateY(28px); transition: opacity .7s, transform .7s; }
   .reveal.in > * { opacity: 1; transform: none; }
@@ -295,7 +298,7 @@
   <symbol id="i-return" viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M4.5 14a8 8 0 1 0 2-7.5L4 10"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1l2.8 8.2L23 12l-8.2 2.8L12 23l-2.8-8.2L1 12l8.2-2.8z"/></symbol>
-  <symbol id="i-flow" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="18" r="2.2"/><path d="M7 6h6a3 3 0 0 1 3 3v1M7 18h6a3 3 0 0 0 3-3v-1"/></symbol>
+  <symbol id="i-support" viewBox="0 0 24 24"><path d="M4 5h16v11H11l-4 4v-4H4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></symbol>
   <symbol id="i-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#FF5A1F"/><circle cx="16" cy="16" r="11" fill="#FFF3DE"/><path d="M16 6v20M6 16h20M9 9l14 14M23 9L9 23" stroke="#FF5A1F" stroke-width="1.6" fill="none"/><circle cx="16" cy="16" r="2.4" fill="#FF5A1F"/></symbol>
 </svg>
 
@@ -419,23 +422,16 @@
   </form>
 </div></div>
 
-<button class="insbtn" id="insbtn" data-action="inspector" aria-expanded="false" aria-controls="inspector"><svg class="i"><use href="#i-flow"/></svg><span>작동 원리</span></button>
-<aside class="inspector" id="inspector" aria-label="작동 원리">
-  <div class="ihead"><b>작동 원리</b><small>누른 동작이 코드에서 흐르는 길</small><button class="x" data-action="inspector" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
-  <div class="flow" id="flow">
-    <i class="dot" id="ins-dot"></i>
-    <div class="node"><span class="n">이벤트</span><span class="q">언제?</span><code class="code">click</code></div>
-    <div class="node"><span class="n">함수</span><span class="q">무엇을?</span><code class="code">ACTIONS[…]()</code></div>
-    <div class="node"><span class="n">객체</span><span class="q">어떤 데이터?</span><code class="code">cart</code></div>
-    <div class="node"><span class="n">화면</span><span class="q">어떻게 보여?</span><code class="code">render…()</code></div>
+<button class="chatbtn" id="chatbtn" data-action="chat" aria-expanded="false" aria-controls="chat" aria-label="문의 채팅 열기"><svg class="i"><use href="#i-support"/></svg><span class="t">문의</span><i class="chatdot" id="chatdot">1</i></button>
+<section class="chat" id="chat" role="dialog" aria-label="문의 응대 채팅">
+  <div class="chead">
+    <span class="ava"><svg class="i"><use href="#i-support"/></svg></span>
+    <div><b>제주상점 문의</b><small>자동 안내 · 상품·주문·반품·로그인</small></div>
+    <button class="x" data-action="chat-close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button>
   </div>
-  <div class="explain" id="ins-explain"><b>아무 버튼이나 눌러 보세요</b><p>상품을 담거나 카테고리를 고르면, 방금 한 동작이 이벤트 → 함수 → 객체 → 화면 순서로 어떻게 흘렀는지 여기서 보여줘요.</p></div>
-  <div class="ins-grid">
-    <div><h4>cart 객체 (실시간)</h4><pre id="ins-cart">cart = {}</pre><small id="ins-names"></small></div>
-    <div><h4>최근 동작</h4><ol id="ins-log"><li class="muted">아직 없어요</li></ol></div>
-  </div>
-  <button class="btn dark sm" data-action="inspector-demo">직접 눌러보기 (오늘의 상품 담기)</button>
-</aside>
+  <div class="clog" id="clog" aria-live="polite"></div>
+  <form class="chatform" id="chatform"><input class="field" id="chatq" placeholder="궁금한 걸 물어보세요" maxlength="200" autocomplete="off" aria-label="문의 입력" /><button class="btn dark">보내기</button></form>
+</section>
 
 <div class="toasts" id="toasts"></div>
 
@@ -785,12 +781,6 @@ const requireUser = () => { if (S.user) return true; toast('로그인이 필요�
 /* 액션 레지스트리: data-action 이름 -> 함수. 버튼이 몇 개든 리스너는 하나. */
 /* 상태(S)는 객체 한곳, 화면은 render 함수가 그린다.                       */
 /* ------------------------------------------------------------------ */
-const ACTION_LABEL = {
-  add: '장바구니에 담기', inc: '수량 늘리기', dec: '수량 줄이기', rm: '장바구니에서 삭제', checkout: '주문하기', return: '반품 신청',
-  like: '좋아요', 'toggle-c': '댓글 펼치기', 'del-post': '글 삭제', 'del-c': '댓글 삭제', 'open-cart': '장바구니 열기',
-  'open-orders': '주문내역 열기', auth: '로그인/로그아웃', settings: '연결 설정', filter: '카테고리 고르기', search: '상품 검색', sort: '정렬 바꾸기',
-};
-
 async function changeQty(id, d) {
   const cur = S.cart.find((c) => c.product_id === id); if (!cur) return;
   const q = cur.quantity + d;
@@ -830,109 +820,131 @@ const ACTIONS = {
   'toggle-c': (el, id) => { S.openComments.has(id) ? S.openComments.delete(id) : S.openComments.add(id); renderPosts(); },
   'del-post': async (el, id) => { if (confirm('글을 삭제할까요?')) { await need(() => api.delPost(id)); await refreshPosts(); } },
   'del-c': async (el, id) => { await need(() => api.delComment(id, Number(el.dataset.cid))); await refreshPosts(); },
-  inspector: () => Inspector.toggle(),
-  'inspector-demo': () => Inspector.demo(),
-};
-
-/* ------------------------------------------------------------------ */
-/* 작동 원리: 실제로 누른 동작을 이벤트 -> 함수 -> 객체 -> 화면으로 기록   */
-/* ------------------------------------------------------------------ */
-const Trace = {
-  rec: null, log: [],
-  snap: () => ({
-    cart: Object.fromEntries(S.cart.map((c) => [c.product_id, c.quantity])),
-    orders: S.orders.length,
-    openComments: S.openComments.size,
-    view: `${S.cat}${S.q ? ` / "${S.q}"` : ''}${S.sort !== 'id' ? ` / ${S.sort}` : ''}`,
-  }),
-  begin(action, data, evt = 'click') { this.rec = { at: new Date(), action, evt, data, before: this.snap(), after: null, renders: [] }; },
-  render(name) { if (this.rec && !this.rec.renders.includes(name)) this.rec.renders.push(name); },
-  end() {
-    const r = this.rec; if (!r) return;
-    this.rec = null; r.after = this.snap();
-    this.log.unshift(r); this.log.length = Math.min(this.log.length, 6);
-    Inspector.update(r);
-  },
-  async run(action, data, fn, evt) { this.begin(action, data, evt); try { await fn(); } finally { this.end(); } },
-};
-const traced = (name, fn) => (...a) => { Trace.render(name); return fn(...a); };
-renderChrome = traced('renderChrome', renderChrome);
-renderShop = traced('renderShop', renderShop);
-renderCart = traced('renderCart', renderCart);
-renderOrders = traced('renderOrders', renderOrders);
-renderPosts = traced('renderPosts', renderPosts);
-
-const Inspector = {
-  open: false, token: 0, last: null,
-  toggle() {
-    this.open = !this.open;
-    $('#inspector').classList.toggle('show', this.open);
-    $('#insbtn').setAttribute('aria-expanded', String(this.open));
-    this.live();
-    if (this.open && this.last) this.play(this.last);
-  },
-  live() {
-    const s = Trace.snap();
-    $('#ins-cart').textContent = 'cart = ' + JSON.stringify(s.cart);
-    const names = Object.keys(s.cart).map((id) => `${id} = ${prod(Number(id))?.name ?? '?'}`);
-    $('#ins-names').textContent = names.join(' · ');
-  },
-  steps(r) {
-    const label = ACTION_LABEL[r.action] || r.action;
-    const attrs = Object.entries(r.data).map(([k, v]) => `data-${k}="${v}"`).join(' ');
-    const diff = Object.keys(r.after).filter((k) => JSON.stringify(r.after[k]) !== JSON.stringify(r.before[k]));
-    return [
-      { t: '이벤트 발생', code: `${r.evt}${attrs ? ' · ' + attrs : ''}`,
-        text: r.evt === 'click'
-          ? `"${label}"을(를) 눌렀어요. 문서에 달린 리스너 하나가 누른 버튼의 data-action="${r.action}"을 읽어요.`
-          : `"${label}" — ${r.evt} 이벤트가 일어났어요. 입력할 때마다 코드가 깨어나요.` },
-      { t: '함수 호출', code: r.evt === 'click' ? `ACTIONS['${r.action}'](${r.data.id ?? ''})` : `Trace.run('${r.action}')`,
-        text: '이름표로 해당 함수를 찾아 실행해요. 버튼이 몇 개든 코드는 한 곳에 모여 있어요.' },
-      { t: diff.length ? '객체 변경' : '객체 확인', code: diff.length ? diff.map((k) => `${k}: ${JSON.stringify(r.before[k])} → ${JSON.stringify(r.after[k])}`).join('\n') : '변화 없음',
-        text: diff.length ? '함수가 상태 객체를 바꿨어요. 값은 이 객체 한곳에서만 바뀌고, 모든 화면이 같은 값을 봐요.' : '이번 동작은 장바구니·주문 같은 저장 데이터를 바꾸지 않았어요.' },
-      { t: '화면 갱신', code: r.renders.length ? r.renders.map((n) => n + '()').join('\n') : '다시 그린 곳 없음',
-        text: r.renders.length ? '바뀐 객체를 읽어서 화면을 다시 그려요. 객체가 바뀌면 → 함수가 화면을 맞춰 줘요.' : '화면을 다시 그릴 필요가 없었어요.' },
-    ];
-  },
-  update(r) { this.last = r; this.live(); this.list(); if (this.open) this.play(r); },
-  list() {
-    $('#ins-log').innerHTML = Trace.log.map((r) => {
-      const diff = Object.keys(r.after).some((k) => JSON.stringify(r.after[k]) !== JSON.stringify(r.before[k]));
-      return `<li><b>${esc(ACTION_LABEL[r.action] || r.action)}</b><span>${diff ? '객체 변경' : '화면만'} · ${r.at.toLocaleTimeString('ko-KR', { hour12: false })}</span></li>`;
-    }).join('') || '<li class="muted">아직 없어요</li>';
-  },
-  async play(r) {
-    const my = ++this.token, steps = this.steps(r);
-    const nodes = [...document.querySelectorAll('#flow .node')], dot = $('#ins-dot');
-    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    nodes.forEach((n) => n.classList.remove('on', 'done'));
-    for (let i = 0; i < nodes.length; i++) {
-      if (my !== this.token) return;
-      nodes.forEach((n, k) => { n.classList.toggle('on', k === i); n.classList.toggle('done', k < i); });
-      nodes[i].querySelector('.code').textContent = steps[i].code;
-      dot.style.transform = `translateX(${nodes[i].offsetLeft + nodes[i].offsetWidth / 2 - 7}px)`;
-      $('#ins-explain').innerHTML = `<b class="step">${i + 1} / 4</b><b>${steps[i].t}</b><p>${esc(steps[i].text)}</p>`;
-      if (!calm) await new Promise((res) => setTimeout(res, 700));
-    }
-    if (my === this.token) nodes.forEach((n) => { n.classList.remove('on'); n.classList.add('done'); });
-  },
-  demo() {
-    const btn = $('#spot [data-action=add]') || $('#grid [data-action=add]');
-    if (btn) btn.click(); else toast('담을 수 있는 상품이 아직 없어요');
-  },
+  chat: () => Chat.toggle(),
+  'chat-close': () => Chat.setOpen(false),
 };
 
 document.addEventListener('click', async (e) => {
   const tab = e.target.closest('[data-tab]'); if (tab) return setAuthMode(tab.dataset.tab);
-  const cat = e.target.closest('[data-cat]');
-  if (cat) return Trace.run('filter', { cat: cat.dataset.cat }, () => { S.cat = cat.dataset.cat; renderShop(); });
+  const cat = e.target.closest('[data-cat]'); if (cat) { S.cat = cat.dataset.cat; return renderShop(); }
+  const ask = e.target.closest('[data-ask]'); if (ask) return Chat.ask(ask.dataset.ask);
   const el = e.target.closest('[data-action]'); if (!el) return;
-  const { action, ...data } = el.dataset;
-  const run = ACTIONS[action]; if (!run) return;
-  const quiet = action === 'close' || action.startsWith('inspector');
-  if (!quiet) Trace.begin(action, data);
-  try { await run(el, Number(el.dataset.id)); } finally { if (!quiet) Trace.end(); }
+  const run = ACTIONS[el.dataset.action]; if (!run) return;
+  await run(el, Number(el.dataset.id));
 });
+
+/* ------------------------------------------------------------------ */
+/* 문의 응대 채팅: 찾기(질문 의도 읽기) -> 판단(실제 데이터 조회) -> 실행(답변·버튼) */
+/* 상품·가격·장바구니는 불러온 데이터로만 답하고, 사이트에 등록되지 않은 정책은    */
+/* 추측하지 않고 모른다고 말한다.                                              */
+/* ------------------------------------------------------------------ */
+const SUGGEST = ['주문은 어떻게 해요?', '반품하고 싶어요', '가장 저렴한 상품은?', '과일 추천해줘', '내 장바구니 보여줘', '로그인이 안 돼요'];
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const productTokens = (p) => p.name.split(/\s+/).filter((t) => t.length >= 2 && !/^\d|제주|우도|세트|마리|개입/.test(t));
+const matchProducts = (q) => S.products.filter((p) => productTokens(p).some((t) => q.includes(t)));
+const catIn = (q) => (/과일/.test(q) ? '과일' : /수산|생선|해산물/.test(q) ? '수산' : /육류|고기|돼지/.test(q) ? '육류' : /간식|가공|디저트|막걸리/.test(q) ? '간식·가공' : null);
+const dayPick = (pool) => pool[Math.floor(Date.now() / 864e5) % pool.length];
+const line = (p) => `${p.name} — ${won(p.price)}`;
+const addBtn = (p) => ({ label: `${p.name} 담기`, action: 'add', id: p.id });
+const NO_DATA = { text: '상품 정보를 아직 불러오지 못했어요. 잠시 후 다시 물어봐 주세요.' };
+
+// 한 줄이 한 가지 의도: test(질문) 이 참이면 reply(질문) 이 { text, actions } 를 돌려준다
+const INTENTS = [
+  { name: 'product', test: (q) => matchProducts(q).length > 0, reply(q) {
+    const ps = matchProducts(q).slice(0, 3);
+    return { text: ps.map((p) => `${line(p)}\n${p.description}`).join('\n\n'), actions: ps.map(addBtn) };
+  } },
+  { name: 'cart', test: (q) => /장바구니|담은|카트/.test(q), reply() {
+    if (!S.user) return { text: '장바구니는 로그인 후에 확인할 수 있어요.', actions: [{ label: '로그인·가입 열기', action: 'auth' }] };
+    const ls = cartLines();
+    if (!ls.length) return { text: '장바구니가 비어 있어요. 마음에 드는 상품을 담아 보세요.', actions: [{ label: '상품 보러 가기', href: '#shop' }] };
+    const sum = ls.reduce((a, l) => a + l.p.price * l.quantity, 0);
+    return { text: ls.map((l) => `${l.p.name} × ${l.quantity} — ${won(l.p.price * l.quantity)}`).join('\n') + `\n\n합계 ${won(sum)}`, actions: [{ label: '장바구니 열기', action: 'open-cart' }] };
+  } },
+  { name: 'return', test: (q) => /반품|환불|취소|교환/.test(q), reply: () => ({
+    text: '주문내역에서 해당 주문의 "반품 신청"을 누르면 상태가 "반품됨"으로 바뀌어요.\n다만 환불 금액 처리 같은 정산은 이 사이트에서 다루지 않아요.',
+    actions: [{ label: '주문내역 열기', action: 'open-orders' }] }) },
+  { name: 'order', test: (q) => /주문|결제|구매|사고|사려|어떻게 사/.test(q), reply: () => ({
+    text: '① 상품 카드의 + 버튼으로 장바구니에 담아요.\n② 장바구니에서 "주문하기"를 눌러요.\n③ 주문내역에서 확인할 수 있어요.\n\n참고로 이 사이트는 아직 실제 결제가 연결되어 있지 않고, 주문 기록만 남겨요.',
+    actions: [{ label: '장바구니 열기', action: 'open-cart' }, { label: '주문내역 열기', action: 'open-orders' }] }) },
+  { name: 'delivery', test: (q) => /배송|택배|도착|언제 와|운송|송장/.test(q), reply: () => ({
+    text: '배송 일정·방법·비용에 대한 안내는 이 사이트에 등록되어 있지 않아요. 확인되지 않은 내용을 추측해서 말씀드리지 않을게요.' }) },
+  { name: 'login', test: (q) => /로그인|가입|비밀번호|계정|회원|로그아웃/.test(q), reply: () => ({
+    text: '화면 위쪽 사람 아이콘에서 이메일로 가입하거나 로그인할 수 있어요. 가입에는 닉네임(2자 이상)이 필요해요.\n비밀번호 찾기·재설정 기능은 아직 없어요.' + (sb ? '' : '\n지금은 체험 모드라 계정이 이 브라우저에만 저장돼요.'),
+    actions: [{ label: S.user ? '로그아웃' : '로그인·가입 열기', action: 'auth' }] }) },
+  { name: 'price', test: (q) => /저렴|싼|가격|얼마|비싼|예산|이하/.test(q), reply(q) {
+    if (!S.products.length) return NO_DATA;
+    const m = q.match(/(\d+(?:\.\d+)?)\s*만\s*원?/) || null;
+    const budget = m ? Math.round(Number(m[1]) * 10000) : (q.match(/(\d{4,6})\s*원/) ? Number(q.match(/(\d{4,6})\s*원/)[1]) : 0);
+    const asc = [...S.products].sort((a, b) => a.price - b.price);
+    if (budget) {
+      const ok = asc.filter((p) => p.price <= budget).slice(0, 5);
+      return ok.length ? { text: `${won(budget)} 이하 상품이에요.\n` + ok.map(line).join('\n'), actions: ok.slice(0, 3).map(addBtn) }
+        : { text: `${won(budget)} 이하 상품은 없어요. 가장 저렴한 건 ${line(asc[0])}이에요.`, actions: [addBtn(asc[0])] };
+    }
+    const top = asc.slice(0, 3), max = asc[asc.length - 1];
+    return { text: '가장 저렴한 상품이에요.\n' + top.map(line).join('\n') + `\n\n가장 높은 가격은 ${line(max)}이에요.`, actions: top.slice(0, 2).map(addBtn) };
+  } },
+  { name: 'recommend', test: (q) => /추천|뭐 살|선물|인기|뭐가 좋|고민/.test(q), reply(q) {
+    if (!S.products.length) return NO_DATA;
+    const c = catIn(q), pool = c ? S.products.filter((p) => category(p.emoji) === c) : S.products;
+    if (!pool.length) return { text: '해당하는 상품이 없어요.' };
+    const pick = dayPick(pool), cheap = [...pool].sort((a, b) => a.price - b.price)[0];
+    const acts = [addBtn(pick)]; if (cheap.id !== pick.id) acts.push(addBtn(cheap));
+    return { text: `${c ? c + ' 중에서 ' : ''}오늘의 PICK은 ${line(pick)}이에요.\n${pick.description}` + (cheap.id !== pick.id ? `\n\n부담 없이 고르신다면 ${line(cheap)}도 있어요.` : '') + '\n\n(별도 판매 순위 자료가 없어서 오늘의 PICK은 날짜 기준으로 돌아가며 골라요.)', actions: acts };
+  } },
+  { name: 'category', test: (q) => !!catIn(q), reply(q) {
+    const c = catIn(q), ps = S.products.filter((p) => category(p.emoji) === c);
+    return ps.length ? { text: `${c} 상품이에요.\n` + ps.map(line).join('\n'), actions: ps.slice(0, 3).map(addBtn) } : NO_DATA;
+  } },
+  { name: 'jejueo', test: (q) => /제주어|사투리|방언/.test(q), reply() {
+    const w = WORDS[Math.floor(Date.now() / 864e5) % WORDS.length];
+    return { text: `오늘의 제주어는 "${w.w}" — ${w.m}이에요.\n${w.j}`, actions: [{ label: '제주어 더 보기', href: '#jejueo' }] };
+  } },
+  { name: 'human', test: (q) => /상담원|직원|사람|전화|연락|담당자/.test(q), reply: () => ({
+    text: '이 채팅은 자동 안내라서 상담원 연결이나 전화 문의는 제공하지 않아요.\n상품·가격·장바구니·주문·반품·로그인에 대해서는 바로 답해 드릴게요.' }) },
+  { name: 'hello', test: (q) => /^(안녕|하이|hi|hello|혼저)/i.test(q.trim()), reply: () => ({ text: '혼저 옵서예! 상품이나 주문에 대해 궁금한 걸 물어보세요.' }) },
+];
+const FALLBACK = { text: '그건 제가 정확히 답할 수 있는 내용이 아니에요. 상품·가격·장바구니·주문·반품·로그인에 대해 물어봐 주세요.' };
+
+const Chat = {
+  open: false, started: false,
+  setOpen(v) {
+    this.open = v;
+    $('#chat').classList.toggle('show', v);
+    $('#chatbtn').setAttribute('aria-expanded', String(v));
+    $('#chatbtn').classList.toggle('on', v);
+    if (v) { $('#chatdot').hidden = true; if (!this.started) this.start(); setTimeout(() => $('#chatq').focus(), 60); }
+  },
+  toggle() { this.setOpen(!this.open); },
+  say(cls, html) {
+    const d = document.createElement('div'); d.className = 'cmsg ' + cls; d.innerHTML = html;
+    $('#clog').appendChild(d); $('#clog').scrollTop = $('#clog').scrollHeight; return d;
+  },
+  html(r) {
+    const text = esc(r.text).replace(/\n/g, '<br>');
+    const acts = (r.actions || []).map((a) => a.href
+      ? `<a class="cact" href="${a.href}" data-action="chat-close">${esc(a.label)}</a>`
+      : `<button type="button" class="cact" data-action="${a.action}"${a.id != null ? ` data-id="${a.id}"` : ''}>${esc(a.label)}</button>`).join('');
+    return text + (acts ? `<div class="cacts">${acts}</div>` : '');
+  },
+  chips() { return `<div class="cchips">${SUGGEST.map((s) => `<button type="button" data-ask="${esc(s)}">${esc(s)}</button>`).join('')}</div>`; },
+  start() {
+    this.started = true;
+    this.say('bot', esc('혼저 옵서예! (어서 오세요) 상품·주문·반품·로그인에 대해 궁금한 걸 물어보세요.') + this.chips());
+  },
+  async ask(text) {
+    text = String(text).trim(); if (!text) return;
+    if (!this.open) this.setOpen(true);
+    this.say('me', esc(text)); $('#chatq').value = '';
+    const wait = this.say('bot', '<span class="dots"><span></span><span></span><span></span></span>');
+    await sleep(500);
+    const hit = INTENTS.find((i) => i.test(text));
+    wait.innerHTML = this.html(hit ? hit.reply(text) : FALLBACK) + (hit ? '' : this.chips());
+    $('#clog').scrollTop = $('#clog').scrollHeight;
+  },
+};
+$('#chatform').addEventListener('submit', (e) => { e.preventDefault(); Chat.ask($('#chatq').value); });
 
 const AUTH_ERRORS = [
   [/invalid login credentials/i, '이메일 또는 비밀번호가 맞지 않아요'],
@@ -979,9 +991,9 @@ $('#posts').addEventListener('submit', async (e) => {
   if (!requireUser()) return; const input = f.querySelector('input'); const pid = Number(f.dataset.id);
   await need(() => api.addComment(pid, input.value.trim())); await refreshPosts();
 });
-$('#q').addEventListener('input', (e) => Trace.run('search', { q: e.target.value.trim() }, () => { S.q = e.target.value.trim(); renderShop(); }, 'input'));
-$('#sort').addEventListener('change', (e) => Trace.run('sort', { sort: e.target.value }, () => { S.sort = e.target.value; renderShop(); }, 'change'));
-addEventListener('keydown', (e) => e.key === 'Escape' && closeAll());
+$('#q').addEventListener('input', (e) => { S.q = e.target.value.trim(); renderShop(); });
+$('#sort').addEventListener('change', (e) => { S.sort = e.target.value; renderShop(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeAll(); Chat.setOpen(false); } });
 
 /* fly-to-cart */
 function flyToCart(from, p) {
