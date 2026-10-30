@@ -18,5 +18,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [react(), devApi(loadEnv(mode, process.cwd(), ''))],
   build: {
     rollupOptions: { input: { main: 'index.html', guide: 'guide.html' } },
+    chunkSizeWarningLimit: 600, // three.js 는 쇼핑몰·길잡이가 함께 쓰는 하나의 청크(약 546KB)라서 경고 기준만 올린다
   },
 }))

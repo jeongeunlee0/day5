@@ -94,9 +94,9 @@ function resize() {
 addEventListener('resize', resize)
 resize()
 
-const clock = new THREE.Clock()
+const t0 = performance.now()
 renderer.setAnimationLoop(() => {
-  const t = clock.getElapsedTime()
+  const t = (performance.now() - t0) / 1000
   for (const b of bars.values()) if (b.ring.material.opacity > 0) b.ring.scale.setScalar(1 + Math.sin(t * 4) * 0.12)
   controls.update()
   renderer.render(scene, camera)

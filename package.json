@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "preview": "vite preview",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "validate:data": "node scripts/products.mjs validate",
+    "build:seed": "node scripts/products.mjs sql",
+    "build:cursor": "node scripts/make-cursor.mjs",
+    "check": "npm run lint && npm run validate:data && npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
