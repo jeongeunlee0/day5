@@ -218,6 +218,39 @@
   .big { font-size: clamp(3.4rem, 17vw, 13rem); font-weight: 700; letter-spacing: -.05em; line-height: 1; color: var(--tang); }
   .fmeta { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 26px; padding-top: 18px; border-top: 1.5px solid rgba(255,243,222,.25); font-size: .92rem; opacity: .95; }
   footer button { text-decoration: underline; text-underline-offset: 3px; }
+  /* 작동 원리 패널 */
+  .insbtn { position: fixed; left: 16px; bottom: 16px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--cream); border: 1.5px solid var(--cream); font-weight: 700; font-size: .88rem; box-shadow: 0 8px 0 -4px rgba(0,0,0,.25); transition: background .2s; }
+  .insbtn:hover, .insbtn[aria-expanded="true"] { background: var(--tang); color: #fff; }
+  .inspector { position: fixed; left: 16px; bottom: 68px; z-index: 30; width: min(480px, calc(100vw - 32px)); max-height: min(78vh, 640px); overflow: auto; background: var(--paper); border: var(--bd); border-radius: 22px; padding: 16px 18px 18px; box-shadow: 8px 8px 0 var(--ink);
+    opacity: 0; transform: translateY(16px) scale(.98); pointer-events: none; transition: opacity .3s, transform .3s; }
+  .inspector.show { opacity: 1; transform: none; pointer-events: auto; }
+  .ihead { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ihead b { font-size: 1.1rem; } .ihead small { color: var(--muted); flex: 1; }
+  .flow { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-top: 14px; }
+  .flow .dot { position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--tang); border: 1.5px solid var(--ink); transition: transform .55s cubic-bezier(.4,.1,.3,1); z-index: 2; }
+  .flow .node { border: var(--bd); border-radius: 12px; padding: 8px 6px; text-align: center; background: #fff; transition: background .3s, transform .3s; min-width: 0; }
+  .flow .node.on { background: var(--sun); transform: translateY(-3px); }
+  .flow .node.done { background: var(--mint); }
+  .flow .n { display: block; font-weight: 700; font-size: .84rem; }
+  .flow .q { display: block; font-size: .7rem; color: var(--muted); }
+  .flow .code { display: block; margin-top: 5px; font-family: ui-monospace, Consolas, monospace; font-size: .68rem; line-height: 1.35; word-break: break-all; white-space: pre-wrap; min-height: 3.8em; text-align: left; }
+  .explain { margin: 12px 0; padding: 10px 12px; border: var(--bd); border-radius: 14px; background: #fff; min-height: 5.4em; font-size: .9rem; }
+  .explain .step { display: inline-block; background: var(--ink); color: var(--cream); border-radius: 999px; padding: 0 10px; margin-right: 6px; font-size: .78rem; }
+  .explain p { margin: 6px 0 0; line-height: 1.55; }
+  .ins-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ins-grid h4 { font-size: .82rem; margin-bottom: 6px; }
+  .ins-grid pre { background: var(--ink); color: #b9f6ca; border-radius: 10px; padding: 8px 10px; font-size: .78rem; white-space: pre-wrap; word-break: break-all; min-height: 2.6em; }
+  .ins-grid small { display: block; color: var(--muted); font-size: .72rem; margin-top: 4px; }
+  #ins-log { list-style: none; padding: 0; display: grid; gap: 4px; }
+  #ins-log li { display: flex; flex-direction: column; font-size: .78rem; line-height: 1.35; border-bottom: 1px dashed rgba(18,32,31,.25); padding-bottom: 3px; }
+  #ins-log span, #ins-log .muted { color: var(--muted); }
+  .inspector .btn.sm { margin-top: 14px; padding: 10px 18px; font-size: .88rem; }
+  @media (max-width: 720px) {
+    .insbtn span { display: none; } .insbtn { padding: 12px; }
+    .inspector { left: 8px; bottom: 66px; width: calc(100vw - 16px); max-height: 62vh; }
+    .ins-grid { grid-template-columns: 1fr; }
+    .flow .code { font-size: .62rem; }
+  }
   .reveal > * { opacity: 0; transform: translateY(28px); transition: opacity .7s, transform .7s; }
   .reveal.in > * { opacity: 1; transform: none; }
   .reveal.in > :nth-child(2) { transition-delay: .08s; } .reveal.in > :nth-child(3) { transition-delay: .16s; } .reveal.in > :nth-child(4) { transition-delay: .24s; }
@@ -256,6 +289,7 @@
   <symbol id="i-return" viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M4.5 14a8 8 0 1 0 2-7.5L4 10"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 1l2.8 8.2L23 12l-8.2 2.8L12 23l-2.8-8.2L1 12l8.2-2.8z"/></symbol>
+  <symbol id="i-flow" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="18" r="2.2"/><path d="M7 6h6a3 3 0 0 1 3 3v1M7 18h6a3 3 0 0 0 3-3v-1"/></symbol>
   <symbol id="i-logo" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#FF5A1F"/><circle cx="16" cy="16" r="11" fill="#FFF3DE"/><path d="M16 6v20M6 16h20M9 9l14 14M23 9L9 23" stroke="#FF5A1F" stroke-width="1.6" fill="none"/><circle cx="16" cy="16" r="2.4" fill="#FF5A1F"/></symbol>
 </svg>
 
@@ -377,6 +411,24 @@
     <button class="btn dark">저장하고 새로고침</button>
   </form>
 </div></div>
+
+<button class="insbtn" id="insbtn" data-action="inspector" aria-expanded="false" aria-controls="inspector"><svg class="i"><use href="#i-flow"/></svg><span>작동 원리</span></button>
+<aside class="inspector" id="inspector" aria-label="작동 원리">
+  <div class="ihead"><b>작동 원리</b><small>누른 동작이 코드에서 흐르는 길</small><button class="x" data-action="inspector" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="flow" id="flow">
+    <i class="dot" id="ins-dot"></i>
+    <div class="node"><span class="n">이벤트</span><span class="q">언제?</span><code class="code">click</code></div>
+    <div class="node"><span class="n">함수</span><span class="q">무엇을?</span><code class="code">ACTIONS[…]()</code></div>
+    <div class="node"><span class="n">객체</span><span class="q">어떤 데이터?</span><code class="code">cart</code></div>
+    <div class="node"><span class="n">화면</span><span class="q">어떻게 보여?</span><code class="code">render…()</code></div>
+  </div>
+  <div class="explain" id="ins-explain"><b>아무 버튼이나 눌러 보세요</b><p>상품을 담거나 카테고리를 고르면, 방금 한 동작이 이벤트 → 함수 → 객체 → 화면 순서로 어떻게 흘렀는지 여기서 보여줘요.</p></div>
+  <div class="ins-grid">
+    <div><h4>cart 객체 (실시간)</h4><pre id="ins-cart">cart = {}</pre><small id="ins-names"></small></div>
+    <div><h4>최근 동작</h4><ol id="ins-log"><li class="muted">아직 없어요</li></ol></div>
+  </div>
+  <button class="btn dark sm" data-action="inspector-demo">직접 눌러보기 (오늘의 상품 담기)</button>
+</aside>
 
 <div class="toasts" id="toasts"></div>
 
@@ -681,48 +733,157 @@ function setAuthMode(m) {
 }
 const requireUser = () => { if (S.user) return true; toast('로그인이 필요해요'); setAuthMode('in'); openEl('#authmodal'); return false; };
 
+/* ------------------------------------------------------------------ */
+/* 액션 레지스트리: data-action 이름 -> 함수. 버튼이 몇 개든 리스너는 하나. */
+/* 상태(S)는 객체 한곳, 화면은 render 함수가 그린다.                       */
+/* ------------------------------------------------------------------ */
+const ACTION_LABEL = {
+  add: '장바구니에 담기', inc: '수량 늘리기', dec: '수량 줄이기', rm: '장바구니에서 삭제', checkout: '주문하기', return: '반품 신청',
+  like: '좋아요', 'toggle-c': '댓글 펼치기', 'del-post': '글 삭제', 'del-c': '댓글 삭제', 'open-cart': '장바구니 열기',
+  'open-orders': '주문내역 열기', auth: '로그인/로그아웃', settings: '연결 설정', filter: '카테고리 고르기', search: '상품 검색', sort: '정렬 바꾸기',
+};
+
+async function changeQty(id, d) {
+  const cur = S.cart.find((c) => c.product_id === id); if (!cur) return;
+  const q = cur.quantity + d;
+  await need(async () => { q < 1 ? await api.removeCart(id) : await api.setCart(id, q); S.cart = await api.cart(); });
+  renderCart(); renderChrome();
+}
+
+const ACTIONS = {
+  close: () => closeAll(),
+  'open-cart': () => openEl('#cartdrawer'),
+  'open-orders': async () => { if (requireUser()) { await refreshUserData(); openEl('#ordersdrawer'); } },
+  settings: () => { $('#sburl').value = stored.url || ''; $('#sbkey').value = stored.key || ''; openEl('#setmodal'); },
+  auth: async () => {
+    if (S.user) { await sb.auth.signOut(); toast('로그아웃했어요'); } else { setAuthMode('in'); openEl('#authmodal'); }
+  },
+  add: async (el, id) => {
+    if (!requireUser()) return;
+    const cur = S.cart.find((c) => c.product_id === id);
+    await need(async () => { await api.setCart(id, (cur?.quantity || 0) + 1); S.cart = await api.cart(); });
+    flyToCart(el, prod(id)); renderCart(); renderChrome(); toast(ADD_LINES[addN++ % ADD_LINES.length]);
+    const c = $('#count'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
+  },
+  inc: (el, id) => changeQty(id, 1),
+  dec: (el, id) => changeQty(id, -1),
+  rm: async (el, id) => { await need(async () => { await api.removeCart(id); S.cart = await api.cart(); }); renderCart(); renderChrome(); },
+  checkout: async (el) => {
+    const items = cartLines(); if (!items.length) return;
+    el.disabled = true;
+    await need(async () => { await api.order(items); toast('주문 완료! 폭삭 속았수다 (수고하셨습니다)'); });
+    await refreshUserData(); closeAll(); openEl('#ordersdrawer');
+  },
+  return: async (el, id) => {
+    if (!confirm('이 주문을 반품 처리할까요?')) return;
+    await need(async () => { await api.returnOrder(id); toast('반품 처리되었어요'); }); await refreshUserData();
+  },
+  like: async (el, id) => { if (requireUser()) { await need(() => api.toggleLike(id)); await refreshPosts(); } },
+  'toggle-c': (el, id) => { S.openComments.has(id) ? S.openComments.delete(id) : S.openComments.add(id); renderPosts(); },
+  'del-post': async (el, id) => { if (confirm('글을 삭제할까요?')) { await need(() => api.delPost(id)); await refreshPosts(); } },
+  'del-c': async (el, id) => { await need(() => api.delComment(id, Number(el.dataset.cid))); await refreshPosts(); },
+  inspector: () => Inspector.toggle(),
+  'inspector-demo': () => Inspector.demo(),
+};
+
+/* ------------------------------------------------------------------ */
+/* 작동 원리: 실제로 누른 동작을 이벤트 -> 함수 -> 객체 -> 화면으로 기록   */
+/* ------------------------------------------------------------------ */
+const Trace = {
+  rec: null, log: [],
+  snap: () => ({
+    cart: Object.fromEntries(S.cart.map((c) => [c.product_id, c.quantity])),
+    orders: S.orders.length,
+    openComments: S.openComments.size,
+    view: `${S.cat}${S.q ? ` / "${S.q}"` : ''}${S.sort !== 'id' ? ` / ${S.sort}` : ''}`,
+  }),
+  begin(action, data, evt = 'click') { this.rec = { at: new Date(), action, evt, data, before: this.snap(), after: null, renders: [] }; },
+  render(name) { if (this.rec && !this.rec.renders.includes(name)) this.rec.renders.push(name); },
+  end() {
+    const r = this.rec; if (!r) return;
+    this.rec = null; r.after = this.snap();
+    this.log.unshift(r); this.log.length = Math.min(this.log.length, 6);
+    Inspector.update(r);
+  },
+  async run(action, data, fn, evt) { this.begin(action, data, evt); try { await fn(); } finally { this.end(); } },
+};
+const traced = (name, fn) => (...a) => { Trace.render(name); return fn(...a); };
+renderChrome = traced('renderChrome', renderChrome);
+renderShop = traced('renderShop', renderShop);
+renderCart = traced('renderCart', renderCart);
+renderOrders = traced('renderOrders', renderOrders);
+renderPosts = traced('renderPosts', renderPosts);
+
+const Inspector = {
+  open: false, token: 0, last: null,
+  toggle() {
+    this.open = !this.open;
+    $('#inspector').classList.toggle('show', this.open);
+    $('#insbtn').setAttribute('aria-expanded', String(this.open));
+    this.live();
+    if (this.open && this.last) this.play(this.last);
+  },
+  live() {
+    const s = Trace.snap();
+    $('#ins-cart').textContent = 'cart = ' + JSON.stringify(s.cart);
+    const names = Object.keys(s.cart).map((id) => `${id} = ${prod(Number(id))?.name ?? '?'}`);
+    $('#ins-names').textContent = names.join(' · ');
+  },
+  steps(r) {
+    const label = ACTION_LABEL[r.action] || r.action;
+    const attrs = Object.entries(r.data).map(([k, v]) => `data-${k}="${v}"`).join(' ');
+    const diff = Object.keys(r.after).filter((k) => JSON.stringify(r.after[k]) !== JSON.stringify(r.before[k]));
+    return [
+      { t: '이벤트 발생', code: `${r.evt}${attrs ? ' · ' + attrs : ''}`,
+        text: r.evt === 'click'
+          ? `"${label}"을(를) 눌렀어요. 문서에 달린 리스너 하나가 누른 버튼의 data-action="${r.action}"을 읽어요.`
+          : `"${label}" — ${r.evt} 이벤트가 일어났어요. 입력할 때마다 코드가 깨어나요.` },
+      { t: '함수 호출', code: r.evt === 'click' ? `ACTIONS['${r.action}'](${r.data.id ?? ''})` : `Trace.run('${r.action}')`,
+        text: '이름표로 해당 함수를 찾아 실행해요. 버튼이 몇 개든 코드는 한 곳에 모여 있어요.' },
+      { t: diff.length ? '객체 변경' : '객체 확인', code: diff.length ? diff.map((k) => `${k}: ${JSON.stringify(r.before[k])} → ${JSON.stringify(r.after[k])}`).join('\n') : '변화 없음',
+        text: diff.length ? '함수가 상태 객체를 바꿨어요. 값은 이 객체 한곳에서만 바뀌고, 모든 화면이 같은 값을 봐요.' : '이번 동작은 장바구니·주문 같은 저장 데이터를 바꾸지 않았어요.' },
+      { t: '화면 갱신', code: r.renders.length ? r.renders.map((n) => n + '()').join('\n') : '다시 그린 곳 없음',
+        text: r.renders.length ? '바뀐 객체를 읽어서 화면을 다시 그려요. 객체가 바뀌면 → 함수가 화면을 맞춰 줘요.' : '화면을 다시 그릴 필요가 없었어요.' },
+    ];
+  },
+  update(r) { this.last = r; this.live(); this.list(); if (this.open) this.play(r); },
+  list() {
+    $('#ins-log').innerHTML = Trace.log.map((r) => {
+      const diff = Object.keys(r.after).some((k) => JSON.stringify(r.after[k]) !== JSON.stringify(r.before[k]));
+      return `<li><b>${esc(ACTION_LABEL[r.action] || r.action)}</b><span>${diff ? '객체 변경' : '화면만'} · ${r.at.toLocaleTimeString('ko-KR', { hour12: false })}</span></li>`;
+    }).join('') || '<li class="muted">아직 없어요</li>';
+  },
+  async play(r) {
+    const my = ++this.token, steps = this.steps(r);
+    const nodes = [...document.querySelectorAll('#flow .node')], dot = $('#ins-dot');
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    nodes.forEach((n) => n.classList.remove('on', 'done'));
+    for (let i = 0; i < nodes.length; i++) {
+      if (my !== this.token) return;
+      nodes.forEach((n, k) => { n.classList.toggle('on', k === i); n.classList.toggle('done', k < i); });
+      nodes[i].querySelector('.code').textContent = steps[i].code;
+      dot.style.transform = `translateX(${nodes[i].offsetLeft + nodes[i].offsetWidth / 2 - 7}px)`;
+      $('#ins-explain').innerHTML = `<b class="step">${i + 1} / 4</b><b>${steps[i].t}</b><p>${esc(steps[i].text)}</p>`;
+      if (!calm) await new Promise((res) => setTimeout(res, 700));
+    }
+    if (my === this.token) nodes.forEach((n) => { n.classList.remove('on'); n.classList.add('done'); });
+  },
+  demo() {
+    const btn = $('#spot [data-action=add]') || $('#grid [data-action=add]');
+    if (btn) btn.click(); else toast('담을 수 있는 상품이 아직 없어요');
+  },
+};
+
 document.addEventListener('click', async (e) => {
   const tab = e.target.closest('[data-tab]'); if (tab) return setAuthMode(tab.dataset.tab);
-  const cat = e.target.closest('[data-cat]'); if (cat) { S.cat = cat.dataset.cat; return renderShop(); }
+  const cat = e.target.closest('[data-cat]');
+  if (cat) return Trace.run('filter', { cat: cat.dataset.cat }, () => { S.cat = cat.dataset.cat; renderShop(); });
   const el = e.target.closest('[data-action]'); if (!el) return;
-  const a = el.dataset.action, id = Number(el.dataset.id);
-  switch (a) {
-    case 'close': closeAll(); break;
-    case 'open-cart': openEl('#cartdrawer'); break;
-    case 'open-orders': if (requireUser()) { await refreshUserData(); openEl('#ordersdrawer'); } break;
-    case 'settings': $('#sburl').value = stored.url || ''; $('#sbkey').value = stored.key || ''; openEl('#setmodal'); break;
-    case 'auth':
-      if (S.user) { await sb.auth.signOut(); toast('로그아웃했어요'); } else { setAuthMode('in'); openEl('#authmodal'); }
-      break;
-    case 'add': {
-      if (!requireUser()) break;
-      const cur = S.cart.find((c) => c.product_id === id);
-      await need(async () => { await api.setCart(id, (cur?.quantity || 0) + 1); S.cart = await api.cart(); });
-      flyToCart(el, prod(id)); renderCart(); renderChrome(); toast(ADD_LINES[addN++ % ADD_LINES.length]);
-      $('#count').classList.remove('bump'); void $('#count').offsetWidth; $('#count').classList.add('bump');
-      break;
-    }
-    case 'inc': case 'dec': {
-      const cur = S.cart.find((c) => c.product_id === id); if (!cur) break;
-      const q = cur.quantity + (a === 'inc' ? 1 : -1);
-      await need(async () => { q < 1 ? await api.removeCart(id) : await api.setCart(id, q); S.cart = await api.cart(); });
-      renderCart(); renderChrome(); break;
-    }
-    case 'rm': await need(async () => { await api.removeCart(id); S.cart = await api.cart(); }); renderCart(); renderChrome(); break;
-    case 'checkout': {
-      const items = cartLines(); if (!items.length) break;
-      el.disabled = true;
-      await need(async () => { await api.order(items); toast('주문 완료! 폭삭 속았수다 (수고하셨습니다)'); });
-      await refreshUserData(); closeAll(); openEl('#ordersdrawer'); break;
-    }
-    case 'return':
-      if (confirm('이 주문을 반품 처리할까요?')) { await need(async () => { await api.returnOrder(id); toast('반품 처리되었어요'); }); await refreshUserData(); }
-      break;
-    case 'like': if (requireUser()) { await need(() => api.toggleLike(id)); await refreshPosts(); } break;
-    case 'toggle-c': S.openComments.has(id) ? S.openComments.delete(id) : S.openComments.add(id); renderPosts(); break;
-    case 'del-post': if (confirm('글을 삭제할까요?')) { await need(() => api.delPost(id)); await refreshPosts(); } break;
-    case 'del-c': await need(() => api.delComment(id, Number(el.dataset.cid))); await refreshPosts(); break;
-  }
+  const { action, ...data } = el.dataset;
+  const run = ACTIONS[action]; if (!run) return;
+  const quiet = action === 'close' || action.startsWith('inspector');
+  if (!quiet) Trace.begin(action, data);
+  try { await run(el, Number(el.dataset.id)); } finally { if (!quiet) Trace.end(); }
 });
 
 $('#authform').addEventListener('submit', async (e) => {
@@ -753,8 +914,8 @@ $('#posts').addEventListener('submit', async (e) => {
   if (!requireUser()) return; const input = f.querySelector('input'); const pid = Number(f.dataset.id);
   await need(() => api.addComment(pid, input.value.trim())); await refreshPosts();
 });
-$('#q').addEventListener('input', (e) => { S.q = e.target.value.trim(); renderShop(); });
-$('#sort').addEventListener('change', (e) => { S.sort = e.target.value; renderShop(); });
+$('#q').addEventListener('input', (e) => Trace.run('search', { q: e.target.value.trim() }, () => { S.q = e.target.value.trim(); renderShop(); }, 'input'));
+$('#sort').addEventListener('change', (e) => Trace.run('sort', { sort: e.target.value }, () => { S.sort = e.target.value; renderShop(); }, 'change'));
 addEventListener('keydown', (e) => e.key === 'Escape' && closeAll());
 
 /* fly-to-cart */

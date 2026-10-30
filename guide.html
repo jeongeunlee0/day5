@@ -15,8 +15,18 @@
     <span class="chip" id="t-weather">① 날씨 예보 <small>(Open-Meteo)</small></span>
     <span class="chip" id="t-visitors">② 서귀포 관람객 추이 <small>(15125100)</small></span>
   </div>
+  <details class="intro">
+    <summary>이 에이전트는 이렇게 일해요</summary>
+    <ol>
+      <li><b class="f">찾기</b> 도구 2개로 날씨 예보와 월별 관람객 통계를 가져와요.</li>
+      <li><b class="j">판단</b> 가져온 숫자로 야외·실내와 붐비는 정도를 따져요.</li>
+      <li><b class="a">실행</b> 추천한 곳을 지도에 표시하고 카메라를 옮겨요.</li>
+    </ol>
+    <p class="greet"><b>혼저 옵서예</b> — 어서 오세요</p>
+  </details>
   <div id="notice" hidden></div>
   <div id="log" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
   <form id="form">
     <input id="q" autocomplete="off" placeholder="오늘 어디 가면 좋을까요?" maxlength="200" />
     <button id="send">물어보기</button>

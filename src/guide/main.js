@@ -115,7 +115,11 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   tip.hidden = false
 })
 
-// ── 에이전트 대화 ───────────────────────────────────────────────────
+// ── 에이전트: 찾기 → 판단 → 실행 (스킬 3개) ──────────────────────────
+const SUGGEST = ['비 와도 갈 만한 곳 알려줘', '오늘 덜 붐비는 곳은 어디야?', '야외에서 산책하기 좋은 곳 추천해줘']
+const RAINY = /비|눈|소나기|이슬비|뇌우/
+const nameOf = (id) => bars.get(id)?.site.name
+
 function add(cls, text) {
   const d = document.createElement('div')
   d.className = 'msg ' + cls
@@ -125,43 +129,86 @@ function add(cls, text) {
   return d
 }
 
+// 도구 호출 한 건을 사람이 읽는 한 줄로
 function describe(t) {
   const site = t.input.site
   if (t.tool === 'get_weather_forecast') {
-    if (!t.ok) return `① ${site} 날씨 — 실패: ${t.output.error}`
+    if (!t.ok) return `${site} 날씨 — 실패: ${t.output.error}`
     const h = t.output.hours[0]
-    return `① ${site} 날씨 — ${h.time} ${h.tmp}℃ ${h.sky}, 강수확률 ${h.pop}%`
+    return `${site} 날씨 — ${h.time} ${h.tmp}℃ ${h.sky}, 강수확률 ${h.pop}%`
   }
-  return t.ok ? `② ${site} 관람객 — ${t.output.month}월 평균 ${t.output.monthAverage.toLocaleString()}명 (연중 ${t.output.crowdRankOf12}위)` : `② ${site} 관람객 — 실패: ${t.output.error}`
+  return t.ok ? `${site} 관람객 — ${t.output.month}월 평균 ${t.output.monthAverage.toLocaleString()}명 (연중 ${t.output.crowdRankOf12}위)` : `${site} 관람객 — 실패: ${t.output.error}`
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault()
-  const question = qInput.value.trim()
-  if (!question) return
+const SKILLS = {
+  // 찾기: 에이전트가 부른 도구와 그 결과
+  find(data) {
+    return data.trace.length ? data.trace.map(describe) : ['도구를 쓰지 않고 답했어요']
+  },
+  // 판단: 도구 결과에서 읽은 숫자만 정리 (모델의 결론은 위 답변 본문)
+  judge(data) {
+    const rows = []
+    for (const t of data.trace) {
+      if (!t.ok) continue
+      if (t.tool === 'get_weather_forecast') {
+        const hs = t.output.hours
+        const maxPop = Math.max(...hs.map((h) => h.pop ?? 0))
+        const temps = hs.map((h) => h.tmp)
+        const wet = hs.some((h) => RAINY.test(h.sky))
+        rows.push(`${t.input.site}: 강수확률 최대 ${maxPop}% · ${wet ? '비·눈 예보 있음' : '비·눈 예보 없음'} · ${Math.min(...temps)}~${Math.max(...temps)}℃`)
+      } else {
+        rows.push(`${t.input.site}: ${t.output.month}월은 연중 ${t.output.crowdRankOf12}위 (1위가 가장 붐빔)`)
+      }
+    }
+    const picks = data.picks.map(nameOf).filter(Boolean)
+    rows.push(picks.length ? `결론: ${picks.join(', ')}` : '결론: 지도에 표시할 추천을 찾지 못했어요')
+    return rows
+  },
+  // 실행: 지도에 반영 (막대 강조 + 카메라 이동)
+  act(data) {
+    highlight(data.picks)
+    const first = bars.get(data.picks[0])
+    if (first) controls.target.lerp(first.mesh.position, 0.6)
+    const names = data.picks.map(nameOf).filter(Boolean)
+    return [names.length ? `지도에서 ${names.join(', ')} 표시 · 카메라를 ${names[0]}(으)로 이동` : '지도에 표시할 곳이 없어요']
+  },
+}
+
+function showAnswer(box, data) {
+  box.textContent = data.answer
+  const think = document.createElement('details')
+  think.className = 'think'
+  const sum = document.createElement('summary')
+  sum.textContent = '생각 과정 보기'
+  const steps = document.createElement('div')
+  steps.className = 'steps'
+  for (const [cls, label, skill] of [['f', '찾기', SKILLS.find], ['j', '판단', SKILLS.judge], ['a', '실행', SKILLS.act]]) {
+    const row = document.createElement('div')
+    row.className = cls
+    row.textContent = label + '\n' + skill(data).join('\n')
+    steps.appendChild(row)
+  }
+  think.append(sum, steps)
+  box.appendChild(think)
+  for (const [id, tool] of [['t-weather', 'get_weather_forecast'], ['t-visitors', 'get_visitor_trend']]) {
+    $(id).classList.toggle('on', data.trace.some((t) => t.tool === tool))
+  }
+}
+
+async function ask(question) {
+  question = question.trim()
+  if (!question) { qInput.focus(); return }
   qInput.value = ''
   add('user', question)
-  const wait = add('bot', '날씨와 관람객 자료를 보는 중…')
+  const wait = add('bot', '')
+  wait.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>'
   sendBtn.disabled = true
   highlight([])
   try {
     const res = await fetch('/api/agent', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question }) })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || res.status)
-    wait.textContent = data.answer
-    if (data.trace.length) {
-      const tr = document.createElement('div')
-      tr.className = 'trace'
-      tr.textContent = data.trace.map(describe).join('\n')
-      tr.style.whiteSpace = 'pre-wrap'
-      log.appendChild(tr)
-      for (const [id, tool] of [['t-weather', 'get_weather_forecast'], ['t-visitors', 'get_visitor_trend']]) {
-        $(id).classList.toggle('on', data.trace.some((t) => t.tool === tool))
-      }
-    }
-    highlight(data.picks)
-    const first = bars.get(data.picks[0])
-    if (first) controls.target.lerp(first.mesh.position, 0.6)
+    showAnswer(wait, data)
   } catch (err) {
     wait.className = 'msg err'
     wait.textContent = '오류: ' + err.message
@@ -169,7 +216,16 @@ form.addEventListener('submit', async (e) => {
     sendBtn.disabled = false
     log.scrollTop = log.scrollHeight
   }
-})
+}
+
+form.addEventListener('submit', (e) => { e.preventDefault(); ask(qInput.value) })
+for (const s of SUGGEST) {
+  const b = document.createElement('button')
+  b.type = 'button'
+  b.textContent = s
+  b.addEventListener('click', () => ask(s))
+  $('chips').appendChild(b)
+}
 
 ;(async () => {
   try {
@@ -179,7 +235,7 @@ form.addEventListener('submit', async (e) => {
       notice.hidden = false
       notice.textContent = '관람객 CSV(api/_data/seogwipo-visitors.csv)가 아직 없어요. 막대는 같은 높이로 보이고, 관람객 도구는 실패해요.'
     }
-    add('bot', `안녕하세요! 오늘 날씨를 보고 서귀포 관광지를 골라 드릴게요. 예) "비 와도 갈 만한 곳 알려줘"`)
+    add('bot', '혼저 옵서예! 오늘 날씨를 보고 서귀포 관광지를 골라 드릴게요. 아래 질문을 눌러 보거나 직접 물어보세요.')
   } catch {
     notice.hidden = false
     notice.textContent = '서버(/api/agent)에 연결하지 못했어요. npm run dev 로 열었는지 확인해 주세요.'
