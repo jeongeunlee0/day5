@@ -10,7 +10,7 @@ const SYSTEM = `너는 "서귀포 길잡이"다. 오늘 날씨를 보고 서귀�
 관광지: ${SITES.map((s) => `${s.name}(${s.indoor ? '실내' : '야외'})`).join(', ')}.
 
 쓸 수 있는 도구는 둘이다.
-- get_weather_forecast: 기상청 단기예보. 가려는 후보마다 호출한다.
+- get_weather_forecast: 날씨 예보(Open-Meteo). 가려는 후보마다 호출한다.
 - get_visitor_trend: 서귀포시 관람객수 추이(월별 통계). 붐비는 정도를 가늠할 때 쓴다.
 
 규칙:

@@ -5,7 +5,7 @@ import { defineConfig, loadEnv } from 'vite'
 const devApi = (env) => ({
   name: 'dev-api',
   configureServer(server) {
-    Object.assign(process.env, env) // ANTHROPIC_API_KEY, KMA_SERVICE_KEY 는 서버에서만 사용
+    Object.assign(process.env, env) // ANTHROPIC_API_KEY 는 서버에서만 사용
     server.middlewares.use('/api/agent', async (req, res) => {
       const { default: handler } = await server.ssrLoadModule('/api/agent.js')
       return handler(req, res)
