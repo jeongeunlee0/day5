@@ -75,20 +75,22 @@ export default async function handler(req, res) {
     }))
   }
   if (req.method !== 'POST') { res.statusCode = 405; return res.end('{}') }
-  if (!process.env.ANTHROPIC_API_KEY) {
-    res.statusCode = 503
-    return res.end(JSON.stringify({ error: '서버에 ANTHROPIC_API_KEY 가 설정되지 않았어요.' }))
-  }
 
   try {
     let body = req.body
     if (body === undefined) { // 일반 Node 요청(개발 서버)이면 직접 읽는다
       const chunks = []
       for await (const c of req) chunks.push(c)
-      body = JSON.parse(Buffer.concat(chunks).toString() || '{}')
+      try { body = JSON.parse(Buffer.concat(chunks).toString() || '{}') } catch { body = null }
     }
+    if (body === null || typeof body === 'string') { res.statusCode = 400; return res.end(JSON.stringify({ error: '요청 형식이 올바르지 않아요.' })) }
     const question = String(body?.question ?? '').trim().slice(0, 500)
     if (!question) { res.statusCode = 400; return res.end(JSON.stringify({ error: '질문이 비었어요.' })) }
+    // 입력 검증을 먼저 하고, 서버 설정(키) 문제는 그다음에 알린다
+    if (!process.env.ANTHROPIC_API_KEY) {
+      res.statusCode = 503
+      return res.end(JSON.stringify({ error: '서버에 ANTHROPIC_API_KEY 가 설정되지 않았어요.' }))
+    }
     return res.end(JSON.stringify(await runAgent(question)))
   } catch (e) {
     console.error(e)
