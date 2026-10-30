@@ -1,0 +1,27 @@
+:root { --bg: #0B3B3C; --ink: #12201F; --paper: #F6F0E4; --tang: #FF5A1F; --sun: #FFC21A; --mint: #B9DCC9; font-family: "Malgun Gothic", system-ui, sans-serif; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; }
+#map { position: fixed; inset: 0; }
+#map canvas { display: block; }
+#panel { position: fixed; top: 16px; right: 16px; bottom: 16px; width: min(380px, calc(100vw - 32px)); background: var(--paper); border: 1.5px solid var(--ink); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+h1 { font-size: 1.4rem; letter-spacing: -.02em; }
+.sub { font-size: .85rem; color: #44524f; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: .78rem; padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; background: #fff; transition: background .2s; }
+.chip.on { background: var(--sun); }
+.chip small { opacity: .65; }
+#notice { font-size: .82rem; background: #fff3cd; border: 1.5px solid var(--ink); border-radius: 8px; padding: 8px 10px; }
+#log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+.msg { padding: 8px 11px; border-radius: 10px; font-size: .92rem; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; }
+.msg.user { align-self: flex-end; background: var(--tang); color: #fff; }
+.msg.bot { background: #fff; border: 1.5px solid var(--ink); }
+.msg.err { background: #fde2e0; border: 1.5px solid #a33; }
+.trace { font-size: .75rem; color: #44524f; border-left: 3px solid var(--mint); padding-left: 8px; }
+#form { display: flex; gap: 6px; }
+#q { flex: 1; min-width: 0; padding: 9px 11px; border: 1.5px solid var(--ink); border-radius: 10px; font: inherit; background: #fff; }
+button { font: inherit; padding: 9px 14px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--sun); cursor: pointer; }
+button:disabled { opacity: .5; cursor: wait; }
+:focus-visible { outline: 3px solid var(--tang); outline-offset: 2px; }
+.legend { font-size: .72rem; color: #44524f; }
+#tip { position: fixed; pointer-events: none; z-index: 5; background: var(--ink); color: #fff; font-size: .8rem; padding: 4px 9px; border-radius: 6px; }
+@media (max-width: 720px) { #panel { top: auto; height: 52vh; } }
