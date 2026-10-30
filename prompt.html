@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Supabase 스키마 프롬프트</title>
+<style>
+  body { font-family: system-ui, "Malgun Gothic", sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; background: #fff; }
+  button { padding: .5rem 1rem; font-size: 1rem; cursor: pointer; }
+  pre { background: #f5f5f5; padding: 1rem; border-radius: 8px; white-space: pre-wrap; word-break: break-word; }
+  @media (prefers-color-scheme: dark) { body { background: #151515; color: #eee; } pre { background: #222; } }
+</style>
+</head>
+<body>
+<h1>Supabase 스키마 프롬프트</h1>
+<button id="copy">프롬프트 복사</button> <span id="msg"></span>
+<pre id="prompt">Supabase(PostgreSQL)용 SQL 스키마를 작성해줘. 제주 특산품 쇼핑몰 + 방명록 앱이야.
+SQL Editor에 그대로 붙여넣어 실행할 수 있게 한 파일로 만들어줘.
+
+## 테이블
+
+1. products (상품)
+   - id: bigint identity PK
+   - name: text, 필수
+   - description: text
+   - emoji: text
+   - price: integer, 필수, 0보다 커야 함
+   - created_at: timestamptz, 기본값 now()
+
+2. cart_items (장바구니)
+   - id: bigint identity PK
+   - user_id: uuid, 필수, 기본값 auth.uid(), auth.users 참조, 유저 삭제 시 함께 삭제
+   - product_id: bigint, 필수, products 참조, 상품 삭제 시 함께 삭제
+   - quantity: integer, 필수, 기본값 1, 0보다 커야 함
+   - (user_id, product_id) 조합은 유일해야 함
+
+3. orders (주문)
+   - id: bigint identity PK
+   - user_id: uuid, 필수, 기본값 auth.uid(), auth.users 참조, 유저 삭제 시 함께 삭제
+   - product_id: bigint, products 참조, 상품 삭제 시 null로 설정
+   - product_name: text, 필수 (주문 시점 상품명 스냅샷)
+   - unit_price: integer, 필수
+   - quantity: integer, 필수, 0보다 커야 함
+   - total_price: integer, unit_price * quantity로 DB가 자동 계산 (generated stored column)
+   - status: text, 필수, 기본값 'ordered', 'ordered' 또는 'returned'만 허용
+   - created_at: timestamptz, 기본값 now()
+
+4. guestbook_posts (방명록 글)
+   - id: bigint identity PK
+   - user_id: uuid, 필수, 기본값 auth.uid(), auth.users 참조, 유저 삭제 시 함께 삭제
+   - author: text, 필수
+   - content: text, 필수
+   - created_at: timestamptz, 기본값 now()
+
+5. guestbook_comments (댓글)
+   - id: bigint identity PK
+   - post_id: bigint, 필수, guestbook_posts 참조, 글 삭제 시 함께 삭제
+   - user_id: uuid, 필수, 기본값 auth.uid(), auth.users 참조, 유저 삭제 시 함께 삭제
+   - author: text, 필수
+   - content: text, 필수
+   - created_at: timestamptz, 기본값 now()
+
+6. guestbook_likes (좋아요)
+   - post_id: bigint, 필수, guestbook_posts 참조, 글 삭제 시 함께 삭제
+   - user_id: uuid, 필수, 기본값 auth.uid(), auth.users 참조, 유저 삭제 시 함께 삭제
+   - (post_id, user_id)가 복합 PK (한 유저는 글당 좋아요 1회)
+
+모든 테이블은 create table if not exists로 만들어줘.
+
+## RLS (행 단위 보안)
+6개 테이블 모두 RLS를 활성화하고 아래 정책을 만들어줘.
+
+- products: 누구나 조회만 가능
+- cart_items, orders: 본인 행(auth.uid() = user_id)만 모든 작업 가능 (using + with check 둘 다)
+- guestbook_posts, guestbook_comments, guestbook_likes:
+  - 조회: 누구나
+  - 작성: 본인 user_id로만
+  - 삭제: 본인 행만
+  - 수정 정책은 만들지 않음
+
+## 샘플 데이터
+products에 아래 10개를 insert해줘 (이름 / 설명 / 이모지 / 가격).
+
+- 한라봉 3kg / 달콤새콤 제주 한라봉 선물세트 / 🍊 / 28700
+- 천혜향 2kg / 향이 진한 프리미엄 천혜향 / 🍊 / 34300
+- 흑돼지 오겹살 600g / 쫄깃고소한 제주 흑돼지 구이용 / 🐖 / 31900
+- 옥돔 3마리 / 제주 바다에서 잡은 손질 옥돔 / 🐟 / 45200
+- 갈치 2마리 / 은빛 제주 은갈치 (대) / 🐟 / 39800
+- 제주 감귤 초콜릿 / 감귤 풍미 가득한 수제 초콜릿 / 🍫 / 12600
+- 오메기떡 10개입 / 쫀득한 제주 전통 오메기떡 / 🍡 / 17400
+- 우도 땅콩 막걸리 / 우도 땅콩으로 빚은 고소한 막걸리 / 🍶 / 9300
+- 제주 말차 세트 / 제주 오설록 스타일 말차 티백 세트 / 🍵 / 21500
+- 성게 미역국 세트 / 제주 성게알이 듬뿍 든 간편 미역국 / 🥣 / 24900
+
+## 출력 형식
+- 섹션마다 한글 주석(-- 1. 상품 등)을 달아줘.
+- 순서는 테이블 → RLS 활성화 → 정책 → 샘플 데이터로 해줘.</pre>
+<script>
+  document.getElementById('copy').addEventListener('click', async () => {
+    const msg = document.getElementById('msg');
+    try {
+      await navigator.clipboard.writeText(document.getElementById('prompt').textContent);
+      msg.textContent = '복사됨!';
+    } catch {
+      msg.textContent = '복사 실패 — 직접 선택해서 복사하세요.';
+    }
+  });
+</script>
+</body>
+</html>
