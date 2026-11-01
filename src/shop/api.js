@@ -7,8 +7,10 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
 
 const ENV = import.meta.env || {};
 const stored = load('jeju_sb', {});
-const SB_URL = ENV.VITE_SUPABASE_URL || stored.url || SUPABASE_URL;
-const SB_KEY = ENV.VITE_SUPABASE_ANON_KEY || stored.key || SUPABASE_ANON_KEY;
+// VITE_SUPABASE_URL=off 로 실행하면 체험 모드 (브라우저 회귀 검사 등, 실제 DB에 계정을 만들지 않고 시험할 때)
+const FORCE_DEMO = ENV.VITE_SUPABASE_URL === 'off';
+const SB_URL = FORCE_DEMO ? '' : ENV.VITE_SUPABASE_URL || stored.url || SUPABASE_URL;
+const SB_KEY = FORCE_DEMO ? '' : ENV.VITE_SUPABASE_ANON_KEY || stored.key || SUPABASE_ANON_KEY;
 const sb = SB_URL && SB_KEY ? createClient(SB_URL, SB_KEY) : null;
 
 // 상품 원본은 public/data/products.json 한 곳. 체험 모드는 이 파일을, Supabase 모드는 같은 내용을 넣은 products 테이블을 쓴다.

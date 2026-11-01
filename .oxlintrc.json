@@ -3,5 +3,6 @@
   "plugins": [
     "oxc"
   ],
+  "ignorePatterns": ["과제제출_26.10.30/**", "dist/**"],
   "rules": {}
 }

@@ -2,7 +2,8 @@
  * 쇼핑몰 브라우저 회귀 검사 (50개 항목)
  *
  * 사용법
- *   1) npm run dev 로 서버를 켜고 http://localhost:5173/ 을 연다 (체험 모드여야 한다: .env.local 에 Supabase 키가 없을 것)
+ *   1) 체험 모드로 개발 서버를 켜고 http://localhost:5173/ 을 연다
+ *      PowerShell: $env:VITE_SUPABASE_URL='off'; npm run dev   (실제 Supabase 에 시험 계정이 생기지 않게)
  *   2) 개발자 도구(F12) 콘솔에 이 파일 전체를 붙여 넣고 Enter
  *   3) 끝나면 { summary: "50 passed, 0 failed", fail: [] } 가 출력된다
  *
