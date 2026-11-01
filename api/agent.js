@@ -1,6 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { SITES } from './_lib/sites.js'
 import { toolDefs, runTool, monthSnapshot, loadVisitorRows } from './_lib/tools.js'
+import { runRules } from './_lib/rules.js'
+import { checkLimit, clientIp } from './_lib/limit.js'
+
+const MAX_BODY = 10_000 // 바이트. 질문은 500자까지만 쓰므로 이보다 큰 요청은 받지 않는다
 
 const client = new Anthropic() // ANTHROPIC_API_KEY 는 서버 환경변수에서만 읽는다
 const MODEL = 'claude-opus-5-5'
@@ -71,6 +75,7 @@ export default async function handler(req, res) {
       sites: SITES,
       month,
       csvReady: !!loadVisitorRows(),
+      ai: !!process.env.ANTHROPIC_API_KEY, // false 면 규칙 기반 안내 모드
       snapshot: monthSnapshot(month),
     }))
   }
@@ -80,18 +85,30 @@ export default async function handler(req, res) {
     let body = req.body
     if (body === undefined) { // 일반 Node 요청(개발 서버)이면 직접 읽는다
       const chunks = []
-      for await (const c of req) chunks.push(c)
+      let size = 0
+      for await (const c of req) {
+        size += c.length
+        if (size > MAX_BODY) { res.statusCode = 413; return res.end(JSON.stringify({ error: '요청이 너무 커요.' })) }
+        chunks.push(c)
+      }
       try { body = JSON.parse(Buffer.concat(chunks).toString() || '{}') } catch { body = null }
     }
     if (body === null || typeof body === 'string') { res.statusCode = 400; return res.end(JSON.stringify({ error: '요청 형식이 올바르지 않아요.' })) }
     const question = String(body?.question ?? '').trim().slice(0, 500)
     if (!question) { res.statusCode = 400; return res.end(JSON.stringify({ error: '질문이 비었어요.' })) }
-    // 입력 검증을 먼저 하고, 서버 설정(키) 문제는 그다음에 알린다
-    if (!process.env.ANTHROPIC_API_KEY) {
-      res.statusCode = 503
-      return res.end(JSON.stringify({ error: '서버에 ANTHROPIC_API_KEY 가 설정되지 않았어요.' }))
+
+    // 입력 검증 다음에 호출 제한. 반복 호출로 모델 비용·외부 API 호출이 늘어나는 것을 막는다.
+    const limit = checkLimit(clientIp(req))
+    if (!limit.ok) {
+      res.statusCode = 429
+      res.setHeader('Retry-After', String(limit.retryAfter))
+      const wait = limit.retryAfter >= 3600 ? `${Math.ceil(limit.retryAfter / 3600)}시간` : limit.retryAfter >= 60 ? `${Math.ceil(limit.retryAfter / 60)}분` : `${limit.retryAfter}초`
+      return res.end(JSON.stringify({ error: `요청이 너무 많아요. ${wait} 뒤에 다시 시도해 주세요.` }))
     }
-    return res.end(JSON.stringify(await runAgent(question)))
+
+    // 키가 있으면 Claude 가, 없으면 같은 도구를 쓰는 규칙 기반 안내가 답한다 (mode 로 구분)
+    if (!process.env.ANTHROPIC_API_KEY) return res.end(JSON.stringify(await runRules(question)))
+    return res.end(JSON.stringify({ ...(await runAgent(question)), mode: 'ai' }))
   } catch (e) {
     console.error(e)
     res.statusCode = e instanceof Anthropic.APIError ? 502 : 500

@@ -231,9 +231,14 @@ for (const s of SUGGEST) {
   try {
     const info = await (await fetch('/api/agent')).json()
     buildBars(info.sites, info.snapshot)
-    if (!info.csvReady) {
+    // 지금 어떤 상태로 답하는지 숨기지 않고 알린다 (관람객 자료 유무, AI 키 유무)
+    const notes = []
+    if (!info.csvReady) notes.push('관람객 통계 자료가 아직 없어요. 막대는 같은 높이로 보이고, 답변에도 붐비는 정도는 반영되지 않아요.')
+    if (!info.ai) notes.push('AI 키가 설정되지 않아 규칙 기반 안내로 답해요. 같은 날씨·통계 도구를 쓰지만 AI의 판단은 아니에요.')
+    if (notes.length) {
       notice.hidden = false
-      notice.textContent = '관람객 CSV(api/_data/seogwipo-visitors.csv)가 아직 없어요. 막대는 같은 높이로 보이고, 관람객 도구는 실패해요.'
+      notice.style.whiteSpace = 'pre-line'
+      notice.textContent = notes.join('\n')
     }
     add('bot', '혼저 옵서예! 오늘 날씨를 보고 서귀포 관광지를 골라 드릴게요. 아래 질문을 눌러 보거나 직접 물어보세요.')
   } catch {

@@ -4,6 +4,7 @@ import { art } from './art.js';
 import { S, cartLines } from './state.js';
 import { sb } from './api.js';
 import { WORDS, MARQUEE_WORDS } from './content.js';
+import { PAY_METHODS } from './payments.js';
 
 function renderChrome() {
   $('#mode').textContent = sb ? 'Live' : 'Demo';
@@ -89,6 +90,14 @@ function renderHero() {
 
 const renderAll = () => { renderChrome(); renderShop(); renderCart(); renderOrders(); renderPosts(); };
 
+// 결제 확인(체험 결제) 모달: 담은 상품, 합계, 결제 수단
+function renderPay() {
+  const lines = cartLines();
+  $('#paylines').innerHTML = lines.map(({ p, quantity }) => `<div class="payline"><span>${esc(p.name)} × ${quantity}</span><b>${won(p.price * quantity)}</b></div>`).join('');
+  $('#paytotal').textContent = won(lines.reduce((a, l) => a + l.p.price * l.quantity, 0));
+  $('#paymethods').innerHTML = PAY_METHODS.map((m) => `<button type="button" class="chip ${m.id === S.payMethod ? 'on' : ''}" role="radio" aria-checked="${m.id === S.payMethod}" data-action="pay-method" data-method="${m.id}">${m.label}</button>`).join('');
+}
+
 // 데이터와 무관한 고정 영역(제주어 카드, 마퀴)
 function renderStatic() {
   $('#words').innerHTML = WORDS.map((x) => `<article class="word"><div class="w">${x.w}</div><span class="m">${x.m}</span><p class="j">${x.j}</p></article>`).join('');
@@ -96,4 +105,4 @@ function renderStatic() {
   $('#track').innerHTML = one + one + one + one;
 }
 
-export { renderChrome, renderShop, renderCart, renderOrders, renderPosts, renderHero, renderAll, renderStatic };
+export { renderChrome, renderShop, renderCart, renderOrders, renderPosts, renderHero, renderAll, renderStatic, renderPay };

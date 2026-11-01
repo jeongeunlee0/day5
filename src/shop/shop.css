@@ -265,3 +265,15 @@
     .usp div:last-child { border-bottom: 0; }
   }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* 체험 결제 확인 */
+  .paynote { background: var(--sun); border: var(--bd); border-radius: 14px; padding: 10px 14px; font-size: .9rem; margin: 12px 0; }
+  #paylines { max-height: 32vh; overflow: auto; }
+  .payline { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed rgba(18,32,31,.25); font-size: .94rem; }
+  .paymethods { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+
+  /* 중간 폭(약 720~1000px)에서도 로그인한 헤더가 접히거나 넘치지 않게 */
+  .hbtn { white-space: nowrap; }
+  #authbtn .lb { max-width: 12em; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 1000px) { .mode { display: none; } }
+  @media (max-width: 860px) and (min-width: 721px) { .navlink { display: none; } }

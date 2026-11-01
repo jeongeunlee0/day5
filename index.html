@@ -166,6 +166,15 @@
   <form class="chatform" id="chatform"><input class="field" id="chatq" placeholder="궁금한 걸 물어보세요" maxlength="200" autocomplete="off" aria-label="문의 입력" /><button class="btn dark">보내기</button></form>
 </section>
 
+<div class="modal" id="paymodal"><div class="mbox">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1.4rem">주문 확인</h3><button class="x" data-action="close" aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="paynote"><b>체험 결제</b> — 실제로 돈이 청구되지 않고, 카드·계좌 정보도 받지 않아요.</p>
+  <div id="paylines"></div>
+  <div class="total" style="margin-top:12px"><span>결제 예정 금액</span><span id="paytotal">0원</span></div>
+  <div class="paymethods" id="paymethods" role="radiogroup" aria-label="결제 수단"></div>
+  <button class="btn primary" id="payconfirm" data-action="pay-confirm" style="width:100%">체험 결제하고 주문하기</button>
+</div></div>
+
 <div class="toasts" id="toasts"></div>
 
 <script type="module" src="/src/shop/main.js"></script>

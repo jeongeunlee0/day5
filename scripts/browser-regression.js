@@ -1,10 +1,10 @@
 /*
- * 쇼핑몰 브라우저 회귀 검사 (46개 항목)
+ * 쇼핑몰 브라우저 회귀 검사 (50개 항목)
  *
  * 사용법
  *   1) npm run dev 로 서버를 켜고 http://localhost:5173/ 을 연다 (체험 모드여야 한다: .env.local 에 Supabase 키가 없을 것)
  *   2) 개발자 도구(F12) 콘솔에 이 파일 전체를 붙여 넣고 Enter
- *   3) 끝나면 { summary: "46 passed, 0 failed", fail: [] } 가 출력된다
+ *   3) 끝나면 { summary: "50 passed, 0 failed", fail: [] } 가 출력된다
  *
  * 주의: 이 브라우저의 localStorage 를 지우고 테스트 계정(qa1@example.com)을 만든 뒤 다시 지운다.
  *       자동 테스트 러너가 아니라 눈으로 확인하는 점검표를 코드로 옮긴 것이다.
@@ -18,6 +18,8 @@
   const R = { pass: [], fail: [] };
   const ok = (name, cond, info) => (cond ? R.pass : R.fail).push(cond ? name : `${name} → ${JSON.stringify(info)}`);
 
+  // 화면이 이미 로그인된 상태일 수 있으므로, 저장소를 지우기 전에 화면에서 먼저 로그아웃해 깨끗한 상태에서 시작한다
+  if (/로그아웃/.test($('#authbtn').textContent)) { $('#authbtn').click(); await w(900); }
   localStorage.clear();
   location.hash = '';
   document.documentElement.style.scrollBehavior = 'auto';
@@ -100,8 +102,17 @@
   ok('own post deleted', $$('.post').length === before - 1, 0);
 
   // 주문 / 반품
-  $('[data-action=open-cart]').click(); await w(400); $('#checkout').click(); await w(900);
-  ok('order created and cart emptied', $$('#ordersbody .line').length >= 1 && $('#count').textContent === '0', [$$('#ordersbody .line').length, $('#count').textContent]);
+  $('[data-action=open-cart]').click(); await w(400); $('#checkout').click(); await w(400);
+  ok('checkout opens the demo payment step with a clear notice', $('#paymodal').classList.contains('show') && /체험 결제/.test($('#paymodal').innerText) && /실제로 돈이 청구되지 않/.test($('#paymodal').innerText), $('#paymodal').innerText.slice(0, 80));
+  ok('payment summary total equals the cart total', num($('#paytotal').textContent) === num($('#carttotal').textContent) && num($('#paytotal').textContent) > 0, [$('#paytotal').textContent, $('#carttotal').textContent]);
+  const cartBefore = $('#count').textContent, ordersBefore = $$('#ordersbody .line').length;
+  $('#paymethods [data-method=fail]').click(); await w(100);
+  toastClear(); $('#payconfirm').click(); await w(1300);
+  ok('failed payment creates no order and keeps the cart', $$('#ordersbody .line').length === ordersBefore && $('#count').textContent === cartBefore && !!$('.toast.err'), [$$('#ordersbody .line').length, ordersBefore, $('#count').textContent, cartBefore]);
+  ok('failed payment leaves the confirm button usable', !$('#payconfirm').disabled && /체험 결제하고 주문하기/.test($('#payconfirm').textContent), $('#payconfirm').textContent);
+  $('#paymethods [data-method=card]').click(); await w(100);
+  $('#payconfirm').click(); await w(1500);
+  ok('order created and cart emptied after a successful payment', $$('#ordersbody .line').length >= 1 && $('#count').textContent === '0', [$$('#ordersbody .line').length, $('#count').textContent]);
   $('#ordersbody [data-action=return]').click(); await w(400);
   ok('return works', $$('#ordersbody .status').some((x) => x.textContent === '반품됨'), $$('#ordersbody .status').map((x) => x.textContent));
   $('#ordersdrawer [data-action=close]').click(); await w(300);

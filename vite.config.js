@@ -1,4 +1,3 @@
-import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
 
 // 개발 중에는 Vercel 함수(api/agent.js)를 Vite 서버에 그대로 붙여 쓴다.
@@ -15,7 +14,7 @@ const devApi = (env) => ({
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), devApi(loadEnv(mode, process.cwd(), ''))],
+  plugins: [devApi(loadEnv(mode, process.cwd(), ''))],
   build: {
     rollupOptions: { input: { main: 'index.html', guide: 'guide.html' } },
     chunkSizeWarningLimit: 600, // three.js 는 쇼핑몰·길잡이가 함께 쓰는 하나의 청크(약 546KB)라서 경고 기준만 올린다

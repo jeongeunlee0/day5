@@ -2,12 +2,13 @@
 import { $, toast } from './util.js';
 import { S, prod, cartLines, need } from './state.js';
 import { api, stored } from './api.js';
-import { renderCart, renderChrome, renderPosts, renderShop } from './render.js';
+import { renderCart, renderChrome, renderPosts, renderShop, renderPay } from './render.js';
 import { refreshUserData, refreshPosts } from './session.js';
 import { closeAll, openEl, setAuthMode, requireUser } from './ui.js';
 import { flyToCart } from './effects.js';
 import { ADD_LINES } from './content.js';
 import { Chat } from './chat.js';
+import { requestPayment } from './payments.js';
 
 let addN = 0;
 
@@ -39,11 +40,27 @@ const ACTIONS = {
   inc: (el, id) => changeQty(id, 1),
   dec: (el, id) => changeQty(id, -1),
   rm: async (el, id) => { await need(async () => { await api.removeCart(id); S.cart = await api.cart(); }); renderCart(); renderChrome(); },
-  checkout: async (el) => {
+  // 주문하기: 먼저 결제 확인 단계를 연다 (체험 결제 — 실제 청구 없음)
+  checkout: () => {
+    if (!cartLines().length) return;
+    S.payMethod = 'card';
+    renderPay();
+    openEl('#paymodal');
+  },
+  'pay-method': (el) => { S.payMethod = el.dataset.method; renderPay(); },
+  // 결제가 성공해야만 주문을 만든다. 실패하면 주문도, 장바구니 변경도 없다.
+  'pay-confirm': async (el) => {
     const items = cartLines(); if (!items.length) return;
-    el.disabled = true;
-    await need(async () => { await api.order(items); toast('주문 완료! 폭삭 속았수다 (수고하셨습니다)'); });
-    await refreshUserData(); closeAll(); openEl('#ordersdrawer');
+    const amount = items.reduce((a, l) => a + l.p.price * l.quantity, 0);
+    const label = el.textContent;
+    el.disabled = true; el.textContent = '결제 처리 중…';
+    try {
+      const pay = await requestPayment({ amount, orderName: items.map((l) => l.p.name).join(', '), method: S.payMethod });
+      if (!pay.ok) { toast(pay.message || '결제에 실패했어요. 주문은 만들어지지 않았어요.', true); return; }
+      try { await api.order(items); } catch (e) { console.error(e); toast(e.message || '주문을 저장하지 못했어요', true); return; }
+      toast('주문 완료! 폭삭 속았수다 (수고하셨습니다)');
+      await refreshUserData(); closeAll(); openEl('#ordersdrawer');
+    } finally { el.disabled = false; el.textContent = label; }
   },
   return: async (el, id) => {
     if (!confirm('이 주문을 반품 처리할까요?')) return;
