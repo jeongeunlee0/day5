@@ -18,7 +18,7 @@
 | 서귀포 길잡이 | `guide.html` + `src/guide/` | 3D 지도 + 대화. 날씨·관람객 통계 도구를 쓰는 에이전트 |
 | 에이전트 API | `api/agent.js`, `api/_lib/` | Vercel 서버리스 함수. Claude(키가 있을 때) 또는 규칙 기반(키가 없을 때) + 호출 제한 |
 | 상품 데이터 | `public/data/products.json` | 상품의 단일 원본 |
-| DB | `supabase/` | 스키마(`schema.sql`)와 상품 시드(`seed_products.sql`) |
+| DB | `supabase/` | 스키마(`schema.sql`) → 보안 보완(`patch_2026-11-01_security.sql`) → 상품 시드(`seed_products.sql`) 순서로 실행. 보완 파일은 쓰기를 가입한 계정으로만 제한하고, 주문 단가 · 이름과 방명록 작성자를 DB가 직접 채워요 |
 | 도구 | `scripts/` | 데이터 점검·시드 생성·관람객 CSV 가져오기·커서 생성·브라우저 회귀 검사 |
 
 ## 2. 빠른 시작

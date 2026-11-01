@@ -80,5 +80,6 @@ create policy "likes read"   on guestbook_likes for select using (true);
 create policy "likes insert" on guestbook_likes for insert with check (auth.uid() = user_id);
 create policy "likes delete" on guestbook_likes for delete using (auth.uid() = user_id);
 
--- 6. 상품 데이터는 supabase/seed_products.sql 을 이어서 실행하세요.
+-- 6. 이어서 supabase/patch_2026-11-01_security.sql 을 실행하세요 (익명 세션 쓰기 차단 · 주문 가격 조작 방지 · 작성자 이름 고정).
+-- 7. 상품 데이터는 supabase/seed_products.sql 을 이어서 실행하세요.
 --    (public/data/products.json 에서 `node scripts/products.mjs sql` 로 만든 파일이라 화면의 체험 모드와 같은 28개 상품이에요.)
